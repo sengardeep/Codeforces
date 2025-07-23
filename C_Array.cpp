@@ -93,7 +93,6 @@ int nCr(int n,int r,int mod=MOD){
     }
     return ans;
 }
-// Solution Function
 void solve() {
     int n;
     read(n);
