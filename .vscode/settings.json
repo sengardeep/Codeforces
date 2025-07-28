@@ -5,7 +5,8 @@
         "ratio": "cpp",
         "random": "cpp",
         "regex": "cpp",
-        "numeric": "cpp"
+        "numeric": "cpp",
+        "xutility": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

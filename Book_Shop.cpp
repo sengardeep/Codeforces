@@ -79,35 +79,19 @@ template<typename T> void print(const vector<T>& v) { for (auto &x : v) cout << 
 
 
 // Created by Deep 
-// Date : 27-07-2025 
-// Time : 18:04
+// Date : 28-07-2025 
+// Time : 15:21
 
 
-const int N=1e5+1;
-vvi dp(N,vi(2,0));
 // Solution Function
 void solve() {
-    int n;
-    read(n);
-    map<int,int> map;
-    int maxi=0;
-    FOR(i,0,n){
-        int x;
-        read(x);
-        maxi=max(maxi,x);
-        map[x]++;
-    }
-    //dp[i][j] : maximum value can achieved by taking or not taking the ith number
-    int ans=0;
-    FOR(i,1,maxi+1)
-    {
-        dp[i][0] += max(dp[i-1][1],dp[i-1][0]);
-        dp[i][1] += (map[i]*i)+dp[i-1][0];
-        ans=max(dp[i][0],dp[i][1]);
-    }
+    int n,x;
+    read(n,x);
+    vi h(n),s(n);
+    read(h);
+    read(s);
 
-    cout<<ans<<endl;
-
+    
 }
 
 // Main Function
@@ -118,7 +102,7 @@ int32_t main() {
         freopen("output.txt", "w", stdout);
     #endif
     int t = 1;
-    // cin >> t;
+    cin >> t;
     while (t--) solve();
     return 0;
 }

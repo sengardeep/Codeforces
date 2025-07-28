@@ -79,35 +79,40 @@ template<typename T> void print(const vector<T>& v) { for (auto &x : v) cout << 
 
 
 // Created by Deep 
-// Date : 27-07-2025 
-// Time : 18:04
+// Date : 28-07-2025 
+// Time : 14:53
+int N=101,M=1e5+1;
+vvi dp(N,vi(M,-1));
 
+int helper(vi &w,vi &v,int idx,int value_left){
+    if(value_left == 0) return 0;
+    if(idx < 0) return 1e15;
 
-const int N=1e5+1;
-vvi dp(N,vi(2,0));
+    if(dp[idx][value_left] != -1) return dp[idx][value_left];
+
+    int ans = helper(w,v,idx-1,value_left);
+    if(v[idx] <= value_left){
+        ans=min(ans,helper(w,v,idx-1,value_left-v[idx])+w[idx]);
+    }
+
+    return dp[idx][value_left] = ans;
+}
 // Solution Function
 void solve() {
-    int n;
-    read(n);
-    map<int,int> map;
-    int maxi=0;
+    int n,k;
+    read(n,k);
+    vi w(n),v(n);
     FOR(i,0,n){
-        int x;
-        read(x);
-        maxi=max(maxi,x);
-        map[x]++;
-    }
-    //dp[i][j] : maximum value can achieved by taking or not taking the ith number
-    int ans=0;
-    FOR(i,1,maxi+1)
-    {
-        dp[i][0] += max(dp[i-1][1],dp[i-1][0]);
-        dp[i][1] += (map[i]*i)+dp[i-1][0];
-        ans=max(dp[i][0],dp[i][1]);
+        read(w[i],v[i]);
     }
 
-    cout<<ans<<endl;
-
+    //dp[i][j] : minimum weight required to achieve sum j
+    for(int i=M-1;i>=0;i--){
+        if(helper(w,v,n-1,i) <= k){
+            cout<<i<<endl;
+            return;
+        }
+    }
 }
 
 // Main Function
