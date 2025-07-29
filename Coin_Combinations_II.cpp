@@ -23,31 +23,41 @@ using namespace __gnu_pbds;
 typedef tree<int, null_type, less<int>, rb_tree_tag, tree_order_statistics_node_update> pbds; // find_by_order, order_of_key
 
 // Debugging Helpers
-template <typename T> void dbg_vec(const T &v) {
+template <typename T>
+void dbg_vec(const T &v)
+{
     cerr << "[ ";
-    for (const auto &x : v) cerr << x << " ";
+    for (const auto &x : v)
+        cerr << x << " ";
     cerr << "]" << endl;
 }
 
 // Utility Functions
 int gcd(int a, int b) { return b ? gcd(b, a % b) : a; }
 int lcm(int a, int b) { return (a / gcd(a, b)) * b; }
-bool is_prime(int n) {
-    if (n <= 1) return false;
-    for (int i = 2; i * i <= n; ++i) if (n % i == 0) return false;
+bool is_prime(int n)
+{
+    if (n <= 1)
+        return false;
+    for (int i = 2; i * i <= n; ++i)
+        if (n % i == 0)
+            return false;
     return true;
 }
-int mod_exp(int base, int exp, int mod = MOD) {
+int mod_exp(int base, int exp, int mod = MOD)
+{
     int result = 1;
-    while (exp) {
-        if (exp % 2 == 1) result = (result * base) % mod;
+    while (exp)
+    {
+        if (exp % 2 == 1)
+            result = (result * base) % mod;
         base = (base * base) % mod;
         exp /= 2;
     }
     return result;
 }
-//Combatronics
-//Uncomment if needed
+// Combatronics
+// Uncomment if needed
 
 // const int N = 1e6 + 1;
 // vector<int> fact(N,1);
@@ -68,57 +78,68 @@ int mod_exp(int base, int exp, int mod = MOD) {
 // }
 
 // Fast Input/Output Functions
-template<typename T> void read(T& x) { cin >> x; }
-template<typename T, typename... Args>
-void read(T& first, Args&... rest) {
+template <typename T>
+void read(T &x) { cin >> x; }
+template <typename T, typename... Args>
+void read(T &first, Args &...rest)
+{
     cin >> first;
     read(rest...);
 }
-template<typename T> void read(vector<T>& v) { for (auto &x : v) cin >> x; }
-template<typename T> void print(const vector<T>& v) { for (auto &x : v) cout << x << " "; cout << endl; }
+template <typename T>
+void read(vector<T> &v)
+{
+    for (auto &x : v)
+        cin >> x;
+}
+template <typename T>
+void print(const vector<T> &v)
+{
+    for (auto &x : v)
+        cout << x << " ";
+    cout << endl;
+}
 
-
-// Created by Deep 
-// Date : 26-07-2025 
+// Created by Deep
+// Date : 26-07-2025
 // Time : 20:40
 
-
 // Solution Function
-void solve() {
-    int n,x;
-    read(n,x);
+void solve()
+{
+    int n, k;
+    read(n, k);
     vi v(n);
     read(v);
 
-    vvi dp(n+1,vi(x+1));
-    // dp[i][k] = number of ways to construct sum k
-    // such that all coins before coin[i] are unusable
-    for(int i = 0; i < n; i++){
-        dp[i][0] = 1;
-    }
-    
-    for(int i = n - 1; i >= 0; i--){
-        for(int sum = 1; sum <= x; sum++){
-            int skipping = dp[i + 1][sum];
-            int picking = 0;
-            if(v[i] <= sum){
-                picking = dp[i][sum - v[i]];
+    vi dp(k + 1, 0);
+    dp[0] = 1;
+    // dp[i] is equal to number of ways to generate sum of i
+    FOR(j, 0, n)
+    {
+        FOR(i, 1, k + 1)
+        {
+            if (i >= v[j])
+            {
+                dp[i] = (dp[i] + dp[i - v[j]]) % MOD;
             }
-            dp[i][sum] = (skipping + picking) % MOD;
         }
     }
-    cout << dp[0][x] << endl;
+
+    cout << dp[k] << endl;
 }
 
 // Main Function
-int32_t main() {
+int32_t main()
+{
     fastio();
-    #ifdef LOCAL
-        freopen("input.txt", "r", stdin);
-        freopen("output.txt", "w", stdout);
-    #endif
+#ifdef LOCAL
+    freopen("input.txt", "r", stdin);
+    freopen("output.txt", "w", stdout);
+#endif
     int t = 1;
     // cin >> t;
-    while (t--) solve();
+    while (t--)
+        solve();
     return 0;
 }
