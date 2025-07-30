@@ -6,7 +6,8 @@
         "random": "cpp",
         "regex": "cpp",
         "numeric": "cpp",
-        "xutility": "cpp"
+        "xutility": "cpp",
+        "vector": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

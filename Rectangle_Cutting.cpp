@@ -23,41 +23,31 @@ using namespace __gnu_pbds;
 typedef tree<int, null_type, less<int>, rb_tree_tag, tree_order_statistics_node_update> pbds; // find_by_order, order_of_key
 
 // Debugging Helpers
-template <typename T>
-void dbg_vec(const T &v)
-{
+template <typename T> void dbg_vec(const T &v) {
     cerr << "[ ";
-    for (const auto &x : v)
-        cerr << x << " ";
+    for (const auto &x : v) cerr << x << " ";
     cerr << "]" << endl;
 }
 
 // Utility Functions
 int gcd(int a, int b) { return b ? gcd(b, a % b) : a; }
 int lcm(int a, int b) { return (a / gcd(a, b)) * b; }
-bool is_prime(int n)
-{
-    if (n <= 1)
-        return false;
-    for (int i = 2; i * i <= n; ++i)
-        if (n % i == 0)
-            return false;
+bool is_prime(int n) {
+    if (n <= 1) return false;
+    for (int i = 2; i * i <= n; ++i) if (n % i == 0) return false;
     return true;
 }
-int mod_exp(int base, int exp, int mod = MOD)
-{
+int mod_exp(int base, int exp, int mod = MOD) {
     int result = 1;
-    while (exp)
-    {
-        if (exp % 2 == 1)
-            result = (result * base) % mod;
+    while (exp) {
+        if (exp % 2 == 1) result = (result * base) % mod;
         base = (base * base) % mod;
         exp /= 2;
     }
     return result;
 }
-// Combatronics
-// Uncomment if needed
+//Combatronics
+//Uncomment if needed
 
 // const int N = 1e6 + 1;
 // vector<int> fact(N,1);
@@ -78,75 +68,56 @@ int mod_exp(int base, int exp, int mod = MOD)
 // }
 
 // Fast Input/Output Functions
-template <typename T>
-void read(T &x) { cin >> x; }
-template <typename T, typename... Args>
-void read(T &first, Args &...rest)
-{
+template<typename T> void read(T& x) { cin >> x; }
+template<typename T, typename... Args>
+void read(T& first, Args&... rest) {
     cin >> first;
     read(rest...);
 }
-template <typename T>
-void read(vector<T> &v)
-{
-    for (auto &x : v)
-        cin >> x;
-}
-template <typename T>
-void print(const vector<T> &v)
-{
-    for (auto &x : v)
-        cout << x << " ";
-    cout << endl;
-}
+template<typename T> void read(vector<T>& v) { for (auto &x : v) cin >> x; }
+template<typename T> void print(const vector<T>& v) { for (auto &x : v) cout << x << " "; cout << endl; }
 
-// Created by Deep
-// Date : 30-07-2025
-// Time : 08:44
+
+// Created by Deep 
+// Date : 30-07-2025 
+// Time : 14:18
+
 
 // Solution Function
-const int N = 3e3 + 1;
-void solve()
-{
-    int n;
-    read(n);
-    vector<string> v(n);
-    read(v);
-
-    vector<vector<string>> dp(n, vector<string>(n));
-    dp[0][0] = string(1, v[0][0]);
-    // dp[i][j] : minimum string from (0,0) to (i,j)
-
-    FOR(i, 0, n)
-    {
-        FOR(j, 0, n)
-        {
-            if (i == 0 && j == 0)
-                continue;
-            string fromTop = (i > 0 ? dp[i - 1][j] : string(n * n, 'Z'));
-            string fromLeft = (j > 0 ? dp[i][j - 1] : string(n * n, 'Z'));
-            if (i > 0 && j > 0)
-                dp[i][j] = min(fromTop, fromLeft) + v[i][j];
-            else if (i > 0)
-                dp[i][j] = fromTop + v[i][j];
-            else
-                dp[i][j] = fromLeft + v[i][j];
+void solve() {
+    int a,b;
+    read(a,b);
+    vvi dp(a+1,vi(b+1,INT_MAX));
+    dp[0][0]=0;
+    FOR(i,0,a+1){
+        FOR(j,0,b+1){
+            if(i==j) dp[i][j]=0;
+            else {
+                 // Horizontal cuts
+                for (int k = 1; k < i; ++k) {
+                    dp[i][j] = min(dp[i][j], dp[k][j] + dp[i - k][j] + 1);
+                }
+                // Vertical cuts
+                for (int k = 1; k < j; ++k) {
+                    dp[i][j] = min(dp[i][j], dp[i][k] + dp[i][j - k] + 1);
+                }
+            }
         }
     }
-    cout << dp[n - 1][n - 1] << endl;
+
+    cout<<dp[a][b]<<endl;
+
 }
 
 // Main Function
-int32_t main()
-{
+int32_t main() {
     fastio();
-#ifdef LOCAL
-    freopen("input.txt", "r", stdin);
-    freopen("output.txt", "w", stdout);
-#endif
+    #ifdef LOCAL
+        freopen("input.txt", "r", stdin);
+        freopen("output.txt", "w", stdout);
+    #endif
     int t = 1;
     // cin >> t;
-    while (t--)
-        solve();
+    while (t--) solve();
     return 0;
 }

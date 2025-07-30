@@ -102,38 +102,34 @@ void print(const vector<T> &v)
 
 // Created by Deep
 // Date : 30-07-2025
-// Time : 08:44
+// Time : 09:00
 
 // Solution Function
-const int N = 3e3 + 1;
 void solve()
 {
     int n;
     read(n);
-    vector<string> v(n);
+    vi v(n);
     read(v);
+    vi dp(100005,0);
+    dp[0]=1;
 
-    vector<vector<string>> dp(n, vector<string>(n));
-    dp[0][0] = string(1, v[0][0]);
-    // dp[i][j] : minimum string from (0,0) to (i,j)
-
-    FOR(i, 0, n)
-    {
-        FOR(j, 0, n)
-        {
-            if (i == 0 && j == 0)
-                continue;
-            string fromTop = (i > 0 ? dp[i - 1][j] : string(n * n, 'Z'));
-            string fromLeft = (j > 0 ? dp[i][j - 1] : string(n * n, 'Z'));
-            if (i > 0 && j > 0)
-                dp[i][j] = min(fromTop, fromLeft) + v[i][j];
-            else if (i > 0)
-                dp[i][j] = fromTop + v[i][j];
-            else
-                dp[i][j] = fromLeft + v[i][j];
+    vi temp;
+    FOR(i,0,n){
+        temp.clear();
+        FOR(j,0,100005){
+            if(dp[j]) temp.pb(j+v[i]);
+        }
+        for(auto it : temp) dp[it]=1;
+    }
+    vi ans;
+    FOR(i,1,1e5+5){
+        if(dp[i]){
+            ans.pb(i);
         }
     }
-    cout << dp[n - 1][n - 1] << endl;
+    cout<<ans.size()<<endl;
+    print(ans);
 }
 
 // Main Function
