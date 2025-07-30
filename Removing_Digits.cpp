@@ -23,41 +23,31 @@ using namespace __gnu_pbds;
 typedef tree<int, null_type, less<int>, rb_tree_tag, tree_order_statistics_node_update> pbds; // find_by_order, order_of_key
 
 // Debugging Helpers
-template <typename T>
-void dbg_vec(const T &v)
-{
+template <typename T> void dbg_vec(const T &v) {
     cerr << "[ ";
-    for (const auto &x : v)
-        cerr << x << " ";
+    for (const auto &x : v) cerr << x << " ";
     cerr << "]" << endl;
 }
 
 // Utility Functions
 int gcd(int a, int b) { return b ? gcd(b, a % b) : a; }
 int lcm(int a, int b) { return (a / gcd(a, b)) * b; }
-bool is_prime(int n)
-{
-    if (n <= 1)
-        return false;
-    for (int i = 2; i * i <= n; ++i)
-        if (n % i == 0)
-            return false;
+bool is_prime(int n) {
+    if (n <= 1) return false;
+    for (int i = 2; i * i <= n; ++i) if (n % i == 0) return false;
     return true;
 }
-int mod_exp(int base, int exp, int mod = MOD)
-{
+int mod_exp(int base, int exp, int mod = MOD) {
     int result = 1;
-    while (exp)
-    {
-        if (exp % 2 == 1)
-            result = (result * base) % mod;
+    while (exp) {
+        if (exp % 2 == 1) result = (result * base) % mod;
         base = (base * base) % mod;
         exp /= 2;
     }
     return result;
 }
-// Combatronics
-// Uncomment if needed
+//Combatronics
+//Uncomment if needed
 
 // const int N = 1e6 + 1;
 // vector<int> fact(N,1);
@@ -78,78 +68,48 @@ int mod_exp(int base, int exp, int mod = MOD)
 // }
 
 // Fast Input/Output Functions
-template <typename T>
-void read(T &x) { cin >> x; }
-template <typename T, typename... Args>
-void read(T &first, Args &...rest)
-{
+template<typename T> void read(T& x) { cin >> x; }
+template<typename T, typename... Args>
+void read(T& first, Args&... rest) {
     cin >> first;
     read(rest...);
 }
-template <typename T>
-void read(vector<T> &v)
-{
-    for (auto &x : v)
-        cin >> x;
-}
-template <typename T>
-void print(const vector<T> &v)
-{
-    for (auto &x : v)
-        cout << x << " ";
-    cout << endl;
-}
+template<typename T> void read(vector<T>& v) { for (auto &x : v) cin >> x; }
+template<typename T> void print(const vector<T>& v) { for (auto &x : v) cout << x << " "; cout << endl; }
 
-// Created by Deep
-// Date : 28-07-2025
-// Time : 15:21
+
+// Created by Deep 
+// Date : 30-07-2025 
+// Time : 00:57
 
 
 // Solution Function
-void solve()
-{
-    int n, x;
-    read(n, x);
-    vi price(n + 1), pages(n + 1);
-    FOR(i, 1, n + 1)
-    read(price[i]);
-    FOR(i, 1, n + 1)
-    read(pages[i]);
-
-    vi dp(x + 1, 0);
-    // dp[i][j] : maximum no. of pages I can get (0..i books) and maximum cost can be j
-
-    // But we need Space Optimization
-
-    vi prev(x + 1, 0);
-    FOR(i, 1, n + 1)
-    {
-        FOR(j, 1, x + 1)
-        {
-            dp[j] = prev[j];
-            if (j >= price[i])
-            {
-                dp[j] = max(dp[j], prev[j - price[i]] + pages[i]);
-            }
+void solve() {
+    int n;
+    read(n);
+    vi dp(n+1,1e6+1);
+    dp[0]=0;
+    //dp[i] : Minimum number of steps required to make i to 0
+    FOR(i,1,10) dp[i]=1; //Base
+    FOR(i,10,n+1){
+        string num = to_string(i);
+        for(auto ch : num){
+            int x = ch - '0';
+            dp[i]=min(dp[i],1+dp[i-x]);
         }
-        prev = dp;
-        fill(dp.begin(), dp.end(), 0);
     }
-
-    cout << prev[x] << endl;
+    cout<<dp[n]<<endl;
 }
 
 // Main Function
-int32_t main()
-{
+int32_t main() {
     fastio();
-#ifdef LOCAL
-    freopen("input.txt", "r", stdin);
-    freopen("output.txt", "w", stdout);
-#endif
+    #ifdef LOCAL
+        freopen("input.txt", "r", stdin);
+        freopen("output.txt", "w", stdout);
+    #endif
     int t = 1;
     // cin >> t;
-    while (t--)
-        solve();
+    while (t--) solve();
     return 0;
 }

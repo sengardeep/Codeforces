@@ -81,34 +81,59 @@ template<typename T> void print(const vector<T>& v) { for (auto &x : v) cout << 
 // Created by Deep 
 // Date : 28-07-2025 
 // Time : 14:53
-int N=101,M=1e5+1;
-vvi dp(N,vi(M,-1));
+// int N=101,M=1e5+1;
+// vvi dp(N,vi(M,-1));
 
-int helper(vi &w,vi &v,int idx,int value_left){
-    if(value_left == 0) return 0;
-    if(idx < 0) return 1e15;
+// int helper(vi &w,vi &v,int idx,int value_left){
+//     if(value_left == 0) return 0;
+//     if(idx < 0) return 1e15;
 
-    if(dp[idx][value_left] != -1) return dp[idx][value_left];
+//     if(dp[idx][value_left] != -1) return dp[idx][value_left];
 
-    int ans = helper(w,v,idx-1,value_left);
-    if(v[idx] <= value_left){
-        ans=min(ans,helper(w,v,idx-1,value_left-v[idx])+w[idx]);
-    }
+//     int ans = helper(w,v,idx-1,value_left);
+//     if(v[idx] <= value_left){
+//         ans=min(ans,helper(w,v,idx-1,value_left-v[idx])+w[idx]);
+//     }
 
-    return dp[idx][value_left] = ans;
-}
+//     return dp[idx][value_left] = ans;
+// }
 // Solution Function
 void solve() {
     int n,k;
     read(n,k);
-    vi w(n),v(n);
-    FOR(i,0,n){
+    vi w(n+1),v(n+1);
+    FOR(i,1,n+1){
         read(w[i],v[i]);
     }
 
-    //dp[i][j] : minimum weight required to achieve sum j
-    for(int i=M-1;i>=0;i--){
-        if(helper(w,v,n-1,i) <= k){
+    // //dp[i][j] : minimum weight required to achieve sum j
+    // for(int i=M-1;i>=0;i--){
+    //     if(helper(w,v,n-1,i) <= k){
+    //         cout<<i<<endl;
+    //         return;
+    //     }
+    // }
+
+    //dp[i][j] : minimum weight (0...i) required to achieve sum j
+    //but we need optimization(Space)
+    const int N = 1e5+1;
+    vi prev(N,INT_MAX);
+    prev[0]=0;
+    FOR(i,0,n+1){
+        vi dp=prev;
+        FOR(j,v[i],N){
+            if(i==0 || j==0) continue;
+            dp[j]=prev[j];
+            if(j>=v[i]){
+                dp[j]=min(dp[j],prev[j-v[i]]+w[i]);
+            }
+        }
+        prev=dp;
+        fill(all(dp),INT_MAX);
+    }
+
+    for(int i=N-1;i>=0;i--){
+        if(prev[i] <= k) {
             cout<<i<<endl;
             return;
         }
