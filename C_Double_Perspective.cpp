@@ -79,51 +79,48 @@ template<typename T> void print(const vector<T>& v) { for (auto &x : v) cout << 
 
 
 // Created by Deep 
-// Date : 31-07-2025 
-// Time : 18:42
+// Date : 01-08-2025 
+// Time : 12:30
 
-double v[3000];
-double dp[3000][3000];
-
-// double helper(int idx, int count, int n) {
-//     if (count < 0) return 0;
-//     if (idx < 0) return (count == 0) ? 1 : 0;
-
-//     if (dp[idx][count] != -1) return dp[idx][count];
-
-//     // take
-//     double take = v[idx] * helper(idx - 1, count - 1, n);
-//     // skip
-//     double skip = (1.0 - v[idx]) * helper(idx - 1, count, n);
-
-//     return dp[idx][count] = take + skip;
-// }
-
+class DSU {
+    vi parent, rank;
+public:
+    DSU(int n) : parent(n), rank(n, 0) {
+        FOR(i, 0, n) parent[i] = i;
+    }
+    int find(int x) {
+        if (parent[x] != x) parent[x] = find(parent[x]);
+        return parent[x];
+    }
+    bool unite(int x, int y) {
+        int xr = find(x), yr = find(y);
+        if (xr == yr) return false;
+        if (rank[xr] < rank[yr]) parent[xr] = yr;
+        else if (rank[xr] > rank[yr]) parent[yr] = xr;
+        else {
+            parent[yr] = xr;
+            rank[xr]++;
+        }
+        return true;
+    }
+};
 // Solution Function
 void solve() {
     int n;
     read(n);
-    FOR(i, 1, n+1) read(v[i]);
-    
-    // dp[i][j] denotes probabilty of getting j heads till i index
-    dp[0][0]=1;
+    DSU ds(2*n+1);
+    vector<int> ans;
     FOR(i,1,n+1){
-        FOR(j,0,i+1){
-            if(j==0) dp[i][j]=(1.0-v[i])*(dp[i-1][j]);
-            else{
-                double headP = v[i]*dp[i-1][j-1];
-                double tailP = (1.0-v[i])*dp[i-1][j];
-                dp[i][j]=headP+tailP;
-            }
+        int u,v;
+        read(u,v);
+        if(ds.find(u)!=ds.find(v)){
+            ds.unite(u,v);
+            ans.push_back(i);
         }
-    } 
-
-    double ans = 0;
-    int x = (n + 1) / 2;
-    for (int heads = x; heads <= n; ++heads) {
-        ans += dp[n][heads];
     }
-    cout << fixed << setprecision(10) << ans << endl;
+
+    cout<<ans.size()<<endl;
+    print(ans);
 }
 
 // Main Function
@@ -134,7 +131,7 @@ int32_t main() {
         freopen("output.txt", "w", stdout);
     #endif
     int t = 1;
-    // cin >> t;
+    cin >> t;
     while (t--) solve();
     return 0;
 }

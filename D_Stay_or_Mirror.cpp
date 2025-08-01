@@ -79,51 +79,26 @@ template<typename T> void print(const vector<T>& v) { for (auto &x : v) cout << 
 
 
 // Created by Deep 
-// Date : 31-07-2025 
-// Time : 18:42
+// Date : 01-08-2025 
+// Time : 12:42
 
-double v[3000];
-double dp[3000][3000];
-
-// double helper(int idx, int count, int n) {
-//     if (count < 0) return 0;
-//     if (idx < 0) return (count == 0) ? 1 : 0;
-
-//     if (dp[idx][count] != -1) return dp[idx][count];
-
-//     // take
-//     double take = v[idx] * helper(idx - 1, count - 1, n);
-//     // skip
-//     double skip = (1.0 - v[idx]) * helper(idx - 1, count, n);
-
-//     return dp[idx][count] = take + skip;
-// }
 
 // Solution Function
 void solve() {
     int n;
     read(n);
-    FOR(i, 1, n+1) read(v[i]);
-    
-    // dp[i][j] denotes probabilty of getting j heads till i index
-    dp[0][0]=1;
+    vi v(n);
+    read(v);
+    int ans=0;
     FOR(i,1,n+1){
-        FOR(j,0,i+1){
-            if(j==0) dp[i][j]=(1.0-v[i])*(dp[i-1][j]);
-            else{
-                double headP = v[i]*dp[i-1][j-1];
-                double tailP = (1.0-v[i])*dp[i-1][j];
-                dp[i][j]=headP+tailP;
-            }
+        int pos=-1;
+        FOR(j,0,v.size()){
+            if(v[j] == i) pos=j;
         }
-    } 
-
-    double ans = 0;
-    int x = (n + 1) / 2;
-    for (int heads = x; heads <= n; ++heads) {
-        ans += dp[n][heads];
+        ans+=min(pos,(int)v.size()-pos-1);
+        v.erase(v.begin()+pos);
     }
-    cout << fixed << setprecision(10) << ans << endl;
+    cout<<ans<<endl;
 }
 
 // Main Function
@@ -134,7 +109,7 @@ int32_t main() {
         freopen("output.txt", "w", stdout);
     #endif
     int t = 1;
-    // cin >> t;
+    cin >> t;
     while (t--) solve();
     return 0;
 }
