@@ -1,6 +1,6 @@
 *.bin
 *.exe
-.cph
+*.cph
 node_modules
-.vscode
-.txt
+*.vscode
+*.txt
