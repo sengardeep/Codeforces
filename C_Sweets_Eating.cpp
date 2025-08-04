@@ -79,37 +79,39 @@ template<typename T> void print(const vector<T>& v) { for (auto &x : v) cout << 
 
 
 // Created by Deep 
-// Date : 03-08-2025 
-// Time : 14:41
+// Date : 04-08-2025 
+// Time : 06:30
 
 
 // Solution Function
 void solve() {
-    int n,l,k;
-    read(n,l,k);
-    vi pos(n),speed(n);
-    read(pos);
-    read(speed);
-    pos.pb(l);
+    int n,m;
+    read(n,m);
+    vi v(n);
+    read(v);
 
-    vvi dp(n+1,vi(k+1,LLONG_MAX));
-    // dp[i][j] : minimum time to reach pos[i] having removed j boards
-    FOR(i,0,k+1) dp[0][i]=0;
+    sort(all(v));
+    //  Observation : suppose m=3,k=7
+    //  a1*3 + (a2+a3+a4)*2 + (a5+a6+a7) This will optimal which can be written as : 
+    //  (2*a1 + (a2+a3+a4)) + (a1+a2+...+a7) Where the first argument is nothing but ans at k=4
+    //  Now we can say that dp[i]=pre[i]+dp[i-m]
 
-    FOR(i,0,n){
-        FOR(j,0,k+1){
-            if(dp[i][j] == LLONG_MAX) continue;
-            FOR(l,0,k-j+1){
-                int nextpos = i + l + 1, rem = j + l;
-                if(nextpos > n || rem > k) continue;
-                dp[nextpos][rem] = min(dp[nextpos][rem], dp[i][j] + (pos[nextpos] - pos[i]) * speed[i]);
-            }
-        }
+    vi dp(n,0);
+    vi pre(n, 0);
+    pre[0] = v[0];
+    FOR(i, 1, n) {
+        pre[i] = pre[i - 1] + v[i];
     }
-
-    int ans = LLONG_MAX;
-    FOR(i,0,k+1) ans = min(ans, dp[n][i]);
-    cout << ans << endl;
+    FOR(i,0,n){
+        int size=i+1;
+        if(size <= m){
+            dp[i]=pre[i];
+        }
+        else{
+            dp[i]=dp[i-m]+pre[i];
+        }
+        cout<<dp[i]<<" ";
+    }
 }
 
 // Main Function
