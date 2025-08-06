@@ -87,37 +87,35 @@ template<typename T> void print(const vector<T>& v) { for (auto &x : v) cout << 
 void solve() {
     int n;
     read(n);
-    // Let d[i] be the number of ways to be at vertex D after i steps.
-    // Let o[i] be the number of ways to be at any other single vertex (A, B, or C) after i steps.
-    // We start at D, so d[0] = 1, o[0] = 0.
-    // Recurrence relations:
-    // d[i] = 3 * o[i-1]
-    // o[i] = d[i-1] + 2 * o[i-1]
-    // This can be solved with matrix exponentiation, but a closed form is simpler.
-    // d[n] = (3^n * 3 + (-1)^n) / 4 if n is even
-    // d[n] = (3^n * 3 - (-1)^n) / 4 if n is odd
-    // which simplifies to:
-    // d[n] = (3^n + 3 * (-1)^n) / 4
-    // Since we need the result modulo MOD, we multiply by the modular inverse of 4.
+    
+    // Let A, B, C, D be the number of ways to reach vertices A, B, C, D respectively.
+    // Initially, at step 0, we are at vertex D.
+    int A = 0, B = 0, C = 0, D = 1;
 
-    if (n == 0) {
-        cout << 1 << endl;
-        return;
+    // We iterate from 1 to n steps.
+    FOR(i, 1, n + 1) {
+        // To reach a vertex at step 'i', we must have been at any of the other three vertices at step 'i-1'.
+        // We calculate the number of ways for the current step 'i' based on the counts from the previous step.
+        // We use temporary variables (a, b, c, d) to store the new counts to avoid using them in the same step's calculation.
+        
+        // Ways to reach A at step 'i' is the sum of ways to be at B, C, or D at step 'i-1'.
+        int a = (B + C + D) % MOD;
+        // Ways to reach B at step 'i' is the sum of ways to be at A, C, or D at step 'i-1'.
+        int b = (A + C + D) % MOD;
+        // Ways to reach C at step 'i' is the sum of ways to be at A, B, or D at step 'i-1'.
+        int c = (A + B + D) % MOD;
+        // Ways to reach D at step 'i' is the sum of ways to be at A, B, or C at step 'i-1'.
+        int d = (A + B + C) % MOD;
+
+        // Update the counts for the next iteration.
+        A = a;
+        B = b;
+        C = c;
+        D = d;
     }
 
-    int term1 = mod_exp(3, n);
-    int term2;
-    if (n % 2 == 0) {
-        term2 = 3;
-    } else {
-        term2 = (MOD - 3);
-    }
-
-    int numerator = (term1 + term2) % MOD;
-    int inv4 = MOD_INV(4);
-    int result = (numerator * inv4) % MOD;
-
-    cout << result << endl;
+    // The final answer is the number of ways to be at vertex D after n steps.
+    cout << D << endl;
 }
 
 // Main Function
