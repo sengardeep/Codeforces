@@ -85,20 +85,19 @@ template<typename T> void print(const vector<T>& v) { for (auto &x : v) cout << 
 
 // Solution Function
 void solve() {
-    int n;
-    read(n);
-    set<int> s;
-    s.insert(-1);
-
-    FOR(i,0,n){
-        int x;
-        read(x);
-        if(s.count(i-1)) s.insert(i+x);
-        if(s.count(i-x-1)) s.insert(i);
+    int n; cin >> n;
+    vector<int> a(n+1);
+    for (int i = 1; i <= n; ++i) {
+        cin >> a[i];
     }
 
-    if(s.count(n-1)) YES
-    else NO
+    vector<bool> dp(n+1, false);
+    dp[0] = true;
+    for (int i = 1; i <= n; ++i) {
+        if (i + a[i] <= n && dp[i-1]) dp[i + a[i]] = true;
+        if (i - a[i] - 1 >= 0 && dp[i - a[i] - 1]) dp[i] = true;
+    }
+    cout << (dp[n] ? "YES" : "NO") << '\n';
 }
 
 // Main Function
