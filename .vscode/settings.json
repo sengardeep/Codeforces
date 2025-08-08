@@ -8,7 +8,9 @@
         "numeric": "cpp",
         "xutility": "cpp",
         "vector": "cpp",
-        "utility": "cpp"
+        "utility": "cpp",
+        "ios": "cpp",
+        "xiosbase": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

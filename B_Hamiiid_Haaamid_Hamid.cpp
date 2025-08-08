@@ -111,37 +111,45 @@ void solve()
     read(n, x);
     string s;
     read(s);
-
-    int pos = x - 1;
-
-    int distL = INT_MAX;
-    for (int i = pos - 1; i >= 0; i--)
+ 
+    int left = -1;
+    for (int i = x - 2; i >= 0; i--)
     {
         if (s[i] == '#')
         {
-            distL = pos - i;
+            left = i + 1;
             break;
         }
     }
-
-    int distR = INT_MAX;
-    for (int i = pos + 1; i < n; ++i)
+    int right = -1;
+    for (int i = x; i < n; i++)
     {
         if (s[i] == '#')
         {
-            distR = i - pos + 1;
+            right = i;
             break;
         }
     }
-
-    if (distL == INT_MAX || distR == INT_MAX)
+ 
+    if ((left == -1 && right == -1) || x==1 || x==n)
     {
         cout << 1 << endl;
+        return;
     }
-    else
-    {
-        cout << max(distL, distR) << endl;
-    }
+    //Set the wall on the left
+    int ans1 = x;
+    if(right != -1) ans1 = min(ans1,n-right+1);
+    else ans1=1;
+
+    //Set the wall on the right
+    int ans2 = n-x+1;
+    if(left != -1) ans2 = min(ans2,left+1);
+    else ans2 = 1;
+
+    // dbg(ans1);
+    // dbg(ans2);
+
+    cout<<max(ans1,ans2)<<endl;
 }
 
 // Main Function
