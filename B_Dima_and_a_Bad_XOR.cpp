@@ -85,31 +85,44 @@ template<typename T> void print(const vector<T>& v) { for (auto &x : v) cout << 
 
 // Solution Function
 void solve() {
-    int n,m;
-    read(n,m);
-    vvi v(n+1,vi(m));
-    FOR(i,1,n+1) read(v[i]);
+    int n, m;
+    read(n, m);
+    vvi v(n + 1, vi(m));
+    FOR(i, 1, n + 1) read(v[i]);
 
-    vvi dp(n+1,vi(1024,-1));
-    dp[0][0]=0;
+    vvi dp(n + 1, vi(1024, -1));
+    dp[0][0] = 0;
 
-    FOR(i,1,n+1){
-        FOR(j,0,m){
-            FOR(k,0,1024){
-                int req=v[i][j]^k;
-                if(dp[i-1][req] != -1) dp[i][k]=j;
+    FOR(i, 1, n + 1) {
+        FOR(j, 0, m) {
+            FOR(k, 0, 1024) {
+                int req = v[i][j] ^ k;
+                if (dp[i - 1][req] != -1) dp[i][k] = j; // store column index j
             }
         }
     }
 
-    bool flag=false;
-    FOR(i,1,1024) if(dp[n][i] != -1) flag=true;
-
-    if(flag){
-        cout<<"TAK"<<endl;
-        
+    int target = -1;
+    FOR(k, 1, 1024) {
+        if (dp[n][k] != -1) { target = k; break; }
     }
-    else cout<<"NIE"<<endl;
+
+    if (target == -1) {
+        cout << "NIE" << endl;
+        return;
+    }
+
+    cout << "TAK" << endl;
+    vi ans(n + 1);
+    for (int i = n; i >= 1; --i) {
+        int j = dp[i][target];
+        ans[i] = j + 1;            // 1-based column index
+        target ^= v[i][j];         // move to previous xor
+    }
+
+    FOR(i, 1, n + 1) {
+        cout << ans[i] << (i == n ? '\n' : ' ');
+    }
 }
 
 // Main Function
