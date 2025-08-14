@@ -79,8 +79,8 @@ template<typename T> void print(const vector<T>& v) { for (auto &x : v) cout << 
 
 
 // Created by Deep 
-// Date : 06-08-2025 
-// Time : 18:40
+// Date : 14-08-2025 
+// Time : 14:04
 
 
 // Solution Function
@@ -89,35 +89,29 @@ void solve() {
     read(n);
     vi v(n);
     read(v);
-    map<int,vector<int>> map;
-    FOR(i,1,n+1){
-        int x=v[i-1];
-        map[x].pb(i);
-    }
-    vi dp(n+1,1);
-    //dp[i] :  maximum length subsequence starting at i
-    for(int i=n;i>0;i--){
-        int num=v[i-1];
-        if(map.count(num+1)){
-            int idx=-1;
-            for(auto it : map[num+1]) 
-            {
-                if(it>i) idx=it;break;
-            }
-            dp[i] = dp[idx]+1;
-        }
+
+    map<int,int> dp; //dp[i] : maximum length subsequence ending at i
+    
+    FOR(i,0,n) dp[v[i]]=1+dp[v[i]-1];
+
+    int end=0;
+    for(auto it : dp){
+        if(it.second > dp[end]) end=it.first;
     }
 
-    int ans=1,num=-1;
-    FOR(i,0,n){
-        if(ans<dp[i]) {
-            ans=dp[i];
-            num=i;
-        }
-    }
-
+    int ans = dp[end];
     cout<<ans<<endl;
-    for(int i=0;i<ans;i++) cout<<num++<<" ";
+    vi res;
+    for(int i=n-1;i>=0;i--){
+        if(v[i]==end)
+        {
+            res.pb(i+1);
+            end-=1;
+        }
+    }
+    reverse(all(res));
+    print(res);
+
 }
 
 // Main Function
