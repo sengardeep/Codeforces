@@ -10,7 +10,11 @@
         "vector": "cpp",
         "utility": "cpp",
         "ios": "cpp",
-        "xiosbase": "cpp"
+        "xiosbase": "cpp",
+        "xstring": "cpp",
+        "algorithm": "cpp",
+        "iterator": "cpp",
+        "xmemory": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }
