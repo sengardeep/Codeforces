@@ -79,63 +79,29 @@ template<typename T> void print(const vector<T>& v) { for (auto &x : v) cout << 
 
 
 // Created by Deep 
-// Date : 20-08-2025 
-// Time : 13:20
+// Date : 19-08-2025 
+// Time : 22:30
 
-const int N=5001;
-int n;
 
 // Solution Function
 void solve() {
-    string s;
-    read(s);
+    int n;
     read(n);
-
-    vector<string> v(n);
-    read(v);
-
-    int m = (int)s.size();
-    vector<int> dp(m + 1, 0);
-    // dp[i] = number of ways to form the prefix s[0..i) using words from the list.
-    // Base case: there is exactly 1 way to form the empty prefix.
-    dp[0] = 1;
-
-    // Optimization: bucket words by their first character so we only test plausible candidates.
-    // This avoids scanning all words at every position.
-    unordered_map<char, vector<string>> bucket;
-    // Reserve buckets to reduce rehashing overhead (n = number of words).
-    bucket.reserve(n * 2);
-    for (auto &w : v) {
-        if (!w.empty()) bucket[w[0]].push_back(w); // skip empty words to prevent infinite extensions
+    int sum=0,mx=0;
+    FOR(i,0,n) {
+        int x;
+        read(x);
+        sum+=x;
+        mx=max(mx,x);
     }
-
-    // Iterate through positions in s (length m). Only extend positions that are reachable.
-    for (int i = 0; i < m; ++i) {
-        if (dp[i] == 0) continue; // no ways to reach i -> nothing to propagate
-
-        // Get only words that could start at s[i].
-        auto it = bucket.find(s[i]);
-        if (it == bucket.end()) continue; // no candidates starting with this char
-
-        // Try placing each candidate word at position i.
-        for (const string &w : it->second) {
-            int L = (int)w.size();
-            // Check bounds and exact match of s[i..i+L) with w.
-            if (i + L <= m && s.compare(i, L, w) == 0) {
-                // Transition: append w to any construction ending at i.
-                dp[i + L] = (dp[i + L] + dp[i]) % MOD;
-            }
-        }
-    }
-
-    // The result is the number of ways to form the entire string s[0..m).
-    cout << dp[m] % MOD;
+    if(sum%2 || mx>sum-mx) NO
+    else YES
 }
 
 // Main Function
 int32_t main() {
     fastio();
-    #ifdef ONLINE_JUDGE
+    #ifdef LOCAL
         freopen("input.txt", "r", stdin);
         freopen("output.txt", "w", stdout);
     #endif

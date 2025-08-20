@@ -80,67 +80,54 @@ template<typename T> void print(const vector<T>& v) { for (auto &x : v) cout << 
 
 // Created by Deep 
 // Date : 20-08-2025 
-// Time : 13:20
+// Time : 18:12
 
-const int N=5001;
-int n;
+int n,m;
+vvi v;
+const int N=1005;
 
 // Solution Function
 void solve() {
-    string s;
-    read(s);
-    read(n);
-
-    vector<string> v(n);
-    read(v);
-
-    int m = (int)s.size();
-    vector<int> dp(m + 1, 0);
-    // dp[i] = number of ways to form the prefix s[0..i) using words from the list.
-    // Base case: there is exactly 1 way to form the empty prefix.
-    dp[0] = 1;
-
-    // Optimization: bucket words by their first character so we only test plausible candidates.
-    // This avoids scanning all words at every position.
-    unordered_map<char, vector<string>> bucket;
-    // Reserve buckets to reduce rehashing overhead (n = number of words).
-    bucket.reserve(n * 2);
-    for (auto &w : v) {
-        if (!w.empty()) bucket[w[0]].push_back(w); // skip empty words to prevent infinite extensions
+    read(n,m);
+    v.assign(n, vi(m));
+    FOR(i,0,n) read(v[i]);
+    if((n+m-1)%2) {
+        NO
+        return;
     }
 
-    // Iterate through positions in s (length m). Only extend positions that are reachable.
-    for (int i = 0; i < m; ++i) {
-        if (dp[i] == 0) continue; // no ways to reach i -> nothing to propagate
+    vvi mn(n, vi(m, (int)4e18));
+    vvi mx(n, vi(m, (int)-4e18));
 
-        // Get only words that could start at s[i].
-        auto it = bucket.find(s[i]);
-        if (it == bucket.end()) continue; // no candidates starting with this char
-
-        // Try placing each candidate word at position i.
-        for (const string &w : it->second) {
-            int L = (int)w.size();
-            // Check bounds and exact match of s[i..i+L) with w.
-            if (i + L <= m && s.compare(i, L, w) == 0) {
-                // Transition: append w to any construction ending at i.
-                dp[i + L] = (dp[i + L] + dp[i]) % MOD;
+    mn[0][0] = v[0][0];
+    mx[0][0] = v[0][0];
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < m; ++j) {
+            if (i == 0 && j == 0) continue;
+            if (i > 0) {
+                mn[i][j] = min(mn[i][j], mn[i-1][j] + v[i][j]);
+                mx[i][j] = max(mx[i][j], mx[i-1][j] + v[i][j]);
+            }
+            if (j > 0) {
+                mn[i][j] = min(mn[i][j], mn[i][j-1] + v[i][j]);
+                mx[i][j] = max(mx[i][j], mx[i][j-1] + v[i][j]);
             }
         }
     }
 
-    // The result is the number of ways to form the entire string s[0..m).
-    cout << dp[m] % MOD;
+    if (mn[n-1][m-1] <= 0 && mx[n-1][m-1] >= 0) YES
+    else NO
 }
 
 // Main Function
 int32_t main() {
     fastio();
-    #ifdef ONLINE_JUDGE
+    #ifdef LOCAL
         freopen("input.txt", "r", stdin);
         freopen("output.txt", "w", stdout);
     #endif
     int t = 1;
-    // cin >> t;
+    cin >> t;
     while (t--) solve();
     return 0;
 }
