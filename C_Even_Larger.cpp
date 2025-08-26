@@ -79,37 +79,29 @@ template<typename T> void print(const vector<T>& v) { for (auto &x : v) cout << 
 
 
 // Created by Deep 
-// Date : 22-08-2025 
-// Time : 23:11
+// Date : 26-08-2025 
+// Time : 20:49
 
-int n,k;
-vi v;
-vector<pair<int,int>> dp;
 
 // Solution Function
 void solve() {
-    read(n,k);
-    v.resize(n);
+    int n;
+    read(n);
+    vi v(n);
     read(v);
-    dp.resize(1<<n);
-    dp[0]={1,0};
-
-    FOR(i,1,1<<n){
-        dp[i]={INT_MAX,INT_MAX};
-
-        for(int p=0;p<n;p++){
-            if(i&(1<<p))
-            {
-                pair<int,int> currChoice = dp[i^(1<<p)];
-                if(currChoice.second + v[p] <= k) currChoice.second+=v[p];
-                else currChoice.first++,currChoice.second=v[p];
-
-                dp[i]=min(dp[i],currChoice);
-            }
+    int ans=0;
+    FOR(i,0,n){
+        if(i%2){
+            int num=v[i-1];
+            if(i+1<n) num+=v[i+1];
+            if(num < v[i]) continue;
+            int rem = num-v[i];
+            if(v[i-1]>v[i]) rem -= (v[i-1]-v[i]);
+            if(i+1<n) v[i+1]-=rem;
+            ans += (num-v[i]);
         }
     }
-
-    cout<<dp[(1<<n)-1].first;
+    cout<<ans<<endl;
 }
 
 // Main Function
@@ -120,7 +112,7 @@ int32_t main() {
         freopen("output.txt", "w", stdout);
     #endif
     int t = 1;
-    // cin >> t;
+    cin >> t;
     while (t--) solve();
     return 0;
 }

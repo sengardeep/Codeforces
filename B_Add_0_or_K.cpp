@@ -79,37 +79,55 @@ template<typename T> void print(const vector<T>& v) { for (auto &x : v) cout << 
 
 
 // Created by Deep 
-// Date : 22-08-2025 
-// Time : 23:11
+// Date : 26-08-2025 
+// Time : 20:22
 
-int n,k;
-vi v;
-vector<pair<int,int>> dp;
 
 // Solution Function
 void solve() {
-    read(n,k);
-    v.resize(n);
+    int n, k;
+    read(n, k);
+    vi v(n);
     read(v);
-    dp.resize(1<<n);
-    dp[0]={1,0};
 
-    FOR(i,1,1<<n){
-        dp[i]={INT_MAX,INT_MAX};
-
-        for(int p=0;p<n;p++){
-            if(i&(1<<p))
-            {
-                pair<int,int> currChoice = dp[i^(1<<p)];
-                if(currChoice.second + v[p] <= k) currChoice.second+=v[p];
-                else currChoice.first++,currChoice.second=v[p];
-
-                dp[i]=min(dp[i],currChoice);
-            }
-        }
+    int g = 0;
+    for (auto it : v) g = gcd(g, it);
+    if (g > 1) {
+        print(v);
+        return;
     }
 
-    cout<<dp[(1<<n)-1].first;
+    if (k & 1) {
+        for (auto it : v) {
+            if (it & 1) cout << it + k << " ";
+            else cout << it << " ";
+        }
+        cout << endl;
+        return;
+    }
+
+    if (k == 0) {
+        print(v);
+        return;
+    }
+
+    auto spf = [](int x) -> int {
+        if (x <= 1) return x;
+        if (x % 2 == 0) return 2;
+        for (int i = 3; i * i <= x; i += 2) if (x % i == 0) return i;
+        return x;
+    };
+
+    int p = spf(k + 1);
+    int inv = mod_exp((k % p + p) % p, p - 2, p);
+
+    for (auto a : v) {
+        int r = (a % p + p) % p;
+        int need = (p - r) % p;
+        int s = (need * inv) % p;
+        cout << a + s * k << " ";
+    }
+    cout << endl;
 }
 
 // Main Function
@@ -120,7 +138,7 @@ int32_t main() {
         freopen("output.txt", "w", stdout);
     #endif
     int t = 1;
-    // cin >> t;
+    cin >> t;
     while (t--) solve();
     return 0;
 }

@@ -79,37 +79,23 @@ template<typename T> void print(const vector<T>& v) { for (auto &x : v) cout << 
 
 
 // Created by Deep 
-// Date : 22-08-2025 
-// Time : 23:11
+// Date : 26-08-2025 
+// Time : 20:10
 
-int n,k;
-vi v;
-vector<pair<int,int>> dp;
 
 // Solution Function
 void solve() {
-    read(n,k);
-    v.resize(n);
-    read(v);
-    dp.resize(1<<n);
-    dp[0]={1,0};
-
-    FOR(i,1,1<<n){
-        dp[i]={INT_MAX,INT_MAX};
-
-        for(int p=0;p<n;p++){
-            if(i&(1<<p))
-            {
-                pair<int,int> currChoice = dp[i^(1<<p)];
-                if(currChoice.second + v[p] <= k) currChoice.second+=v[p];
-                else currChoice.first++,currChoice.second=v[p];
-
-                dp[i]=min(dp[i],currChoice);
-            }
-        }
+    int n,a,b;
+    read(n,a,b);
+    if(b>a){
+        if(b%2==n%2) YES
+        else NO
     }
-
-    cout<<dp[(1<<n)-1].first;
+    else 
+    {
+        if(a%2==n%2 && a%2==b%2) YES
+        else   NO
+    }
 }
 
 // Main Function
@@ -120,7 +106,7 @@ int32_t main() {
         freopen("output.txt", "w", stdout);
     #endif
     int t = 1;
-    // cin >> t;
+    cin >> t;
     while (t--) solve();
     return 0;
 }
