@@ -1,0 +1,89 @@
+#include<bits/stdc++.h>
+using namespace std;
+#define int long long
+const int mod=1e9+7;
+#define endl "\n"
+#define dbg(x) cerr<<#x<<" = "<<(x)<<endl
+
+int32_t main(){
+    ios::sync_with_stdio(0);
+    cin.tie(0);
+
+    #ifdef LOCAL
+    freopen("input.txt","r",stdin);
+    freopen("output.txt","w",stdout);
+    #endif
+
+    int t=1;
+    // cin>>t;
+    while(t--){
+        int n,q;
+        cin>>n>>q;
+        vector<int> v(n);
+        for(int i=0;i<n;i++) cin>>v[i];
+        vector<int> segTree(4 * n + 1,0);
+        vector<int> lazy(4 * n + 1 , 0);
+        
+        auto merge = [&](int a,int b) {return min(a,b);};
+
+        auto push = [&](int index){
+            if(lazy[index]!=0){
+                lazy[2*index] += lazy[index];
+                lazy[2*index+1] += lazy[index];
+                segTree[2*index] += lazy[index];
+                segTree[2*index+1] += lazy[index];
+                lazy[index]=0;
+            }
+        };
+
+        function<void(int,int,int,int,int,int)> update = [&](int start,int end,int index,int l,int r,int val)->void{
+            if(r < start || end < l) return;
+
+            if(l <= start && end <= r){
+                segTree[index] += val;
+                lazy[index] += val;
+                return;
+            }
+
+            int mid=(start+end)/2;
+            if(start != end) push(index);
+            update(start,mid,2*index,l,r,val);
+            update(mid+1,end,2*index+1,l,r,val);
+            segTree[index]=merge(segTree[2*index],segTree[2*index+1]);
+        };
+        function<int(int,int,int,int,int)> query = [&](int start, int end, int index, int l, int r)->int
+        {
+            if(r < start || end < l) return LLONG_MAX;
+            if(l <= start && end <= r) return segTree[index];
+
+            int mid = (start + end) / 2;
+            if(start != end) push(index);
+            int leftAns = query(start, mid, 2 * index, l, r);
+            int rightAns = query(mid + 1, end, 2 * index + 1, l, r);
+
+            return merge(leftAns, rightAns);
+        };
+
+        while(q--){
+            int l,r;
+            cin>>l>>r;
+            --l;
+            --r;
+            update(0,n-1,1,l,r,1);
+        }
+
+
+        vector<int> contribution;
+        for(int i=0;i<n;i++) contribution.push_back(query(0,n-1,1,i,i));
+
+        sort(begin(contribution),end(contribution));
+        sort(begin(v),end(v));
+
+        int ans=0;
+        for(int i=0;i<n;i++) ans += (v[i]*contribution[i]);
+
+        cout<<ans<<endl;
+    }
+
+    return 0;
+}
