@@ -32,61 +32,72 @@ int32_t main()
     // This avoids O(n^2) subarray checks.
 
     int n;
-    cin>>n;
+    cin >> n;
     vector<int> v(n);
-    auto f=[](int n){
-        int ans=0;
-        while(1<<(ans+1) <= n) ans++;
-        return ans; 
+    auto f = [](int n)
+    {
+        int ans = 0;
+        while (1 << (ans + 1) <= n)
+            ans++;
+        return ans;
     };
     int LOG = f(n);
-    vector<vector<int>> st(n,vector<int>(LOG+1));
+    vector<vector<int>> st(n, vector<int>(LOG + 1));
 
-    for(int i=0;i<n;i++) 
+    for (int i = 0; i < n; i++)
     {
-        cin>>v[i];
-        st[i][0]=v[i];
+        cin >> v[i];
+        st[i][0] = v[i];
     }
 
-    //Preprocessing 
-    for(int j=1;j<=LOG;j++) for(int i=0;i+(1<<(j))-1<n;i++) st[i][j]=gcd(st[i][j-1],st[i+(1<<(j-1))][j-1]);
-    function<int(int,int)> query=[&](int l,int r)->int{
-        int len = r-l+1;
-        int k=f(len);
-        return gcd(st[l][k],st[r-(1<<k)+1][k]);
+    // Preprocessing
+    for (int j = 1; j <= LOG; j++)
+        for (int i = 0; i + (1 << (j)) - 1 < n; i++)
+            st[i][j] = gcd(st[i][j - 1], st[i + (1 << (j - 1))][j - 1]);
+    function<int(int, int)> query = [&](int l, int r) -> int
+    {
+        int len = r - l + 1;
+        int k = f(len);
+        return gcd(st[l][k], st[r - (1 << k) + 1][k]);
     };
 
-    map<int,int> ans; //number of subarrays having gcd i
-    
-    
-    for(int i=0;i<n;i++){
+    map<int, int> ans; // number of subarrays having gcd i
 
-        for(int r=i;r<n;r++)
+    for (int i = 0; i < n; i++)
+    {
+        int r = i;
+        int g = v[i];
+        while (r < n)
         {
-            int g = query(i,r);
-            int start=i,end=n-1;
-            int x=r;
-            while(start <= end){
-                int mid = (start+end)/2;
-                if(query(i,mid) == g) 
+            g = gcd(g, v[r]); // progressively extend gcd
+            int low = r, high = n - 1, last = r;
+            // find the farthest position where gcd(i..mid) == g
+            while (low <= high)
+            {
+                int mid = (low + high) / 2;
+                if (query(i, mid) == g)
                 {
-                    x=mid;
-                    start=mid+1;
+                    last = mid;
+                    low = mid + 1;
                 }
-                else end=mid-1;
+                else
+                {
+                    high = mid - 1;
+                }
             }
-            ans[g]+=(x-r+1);
-            r=x;
+            ans[g] += (last - r + 1); // add count of subarrays for this gcd
+            r = last + 1;             // jump directly, don't go step by step
         }
     }
 
     int q;
-    cin>>q;
+    cin >> q;
 
-    while(q--){
+    while (q--)
+    {
         int x;
-        cin>>x;
-        cout<<ans[x]<<endl;
+        cin >> x;
+        cout << ans[x] << endl;
     }
     return 0;
 }
