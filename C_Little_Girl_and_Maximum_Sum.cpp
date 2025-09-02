@@ -21,60 +21,17 @@ int32_t main(){
         cin>>n>>q;
         vector<int> v(n);
         for(int i=0;i<n;i++) cin>>v[i];
-        vector<int> segTree(4 * n + 1,0);
-        vector<int> lazy(4 * n + 1 , 0);
-        
-        auto merge = [&](int a,int b) {return min(a,b);};
-
-        auto push = [&](int index){
-            if(lazy[index]!=0){
-                lazy[2*index] += lazy[index];
-                lazy[2*index+1] += lazy[index];
-                segTree[2*index] += lazy[index];
-                segTree[2*index+1] += lazy[index];
-                lazy[index]=0;
-            }
-        };
-
-        function<void(int,int,int,int,int,int)> update = [&](int start,int end,int index,int l,int r,int val)->void{
-            if(r < start || end < l) return;
-
-            if(l <= start && end <= r){
-                segTree[index] += val;
-                lazy[index] += val;
-                return;
-            }
-
-            int mid=(start+end)/2;
-            if(start != end) push(index);
-            update(start,mid,2*index,l,r,val);
-            update(mid+1,end,2*index+1,l,r,val);
-            segTree[index]=merge(segTree[2*index],segTree[2*index+1]);
-        };
-        function<int(int,int,int,int,int)> query = [&](int start, int end, int index, int l, int r)->int
-        {
-            if(r < start || end < l) return LLONG_MAX;
-            if(l <= start && end <= r) return segTree[index];
-
-            int mid = (start + end) / 2;
-            if(start != end) push(index);
-            int leftAns = query(start, mid, 2 * index, l, r);
-            int rightAns = query(mid + 1, end, 2 * index + 1, l, r);
-
-            return merge(leftAns, rightAns);
-        };
-
+        vector<int> contribution(n,0);
         while(q--){
             int l,r;
             cin>>l>>r;
             --l;
             --r;
-            update(0,n-1,1,l,r,1);
+            contribution[l]+=1;
+            if(r+1<n) contribution[r+1]-=1;
         }
 
-
-        vector<int> contribution;
-        for(int i=0;i<n;i++) contribution.push_back(query(0,n-1,1,i,i));
+        for(int i=1;i<n;i++) contribution[i]+=contribution[i-1];
 
         sort(begin(contribution),end(contribution));
         sort(begin(v),end(v));
