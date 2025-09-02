@@ -14,7 +14,8 @@
         "xstring": "cpp",
         "algorithm": "cpp",
         "iterator": "cpp",
-        "xmemory": "cpp"
+        "xmemory": "cpp",
+        "limits": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }
