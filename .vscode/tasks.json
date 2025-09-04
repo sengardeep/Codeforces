@@ -1,23 +1,24 @@
 {
-  "version": "2.0.0",
-  "tasks": [
-    {
-      "label": "build C++17",
-      "type": "shell",
-      "command": "g++",
-      "args": [
-        "-std=c++17",
-        "-g",
-        "${file}",
-        "-o",
-        "${fileDirname}/${fileBasenameNoExtension}.exe"
-      ],
-      "group": {
-        "kind": "build",
-        "isDefault": true
-      },
-      "problemMatcher": ["$gcc"],
-      "detail": "Compile C++17 source file"
-    }
-  ]
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build & Run C++",
+            "type": "shell",
+            "command": "g++",
+            "args": [
+                "-std=c++14",  // change to c++20 if using MSYS2
+                "-O2",
+                "-Wall",
+                "${file}",
+                "-o",
+                "${fileDirname}\\${fileBasenameNoExtension}.exe"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": ["$gcc"],
+            "detail": "Compile current file with g++"
+        }
+    ]
 }

@@ -1,83 +1,90 @@
-#include<bits/stdc++.h>
-using namespace std;
+#include <bits/stdc++.h>
 #define int long long
-const int mod=1e9+7;
-#define endl "\n"
-#define dbg(x) cerr<<#x<<" = "<<(x)<<endl
+using namespace std;
 
-int32_t main(){
-    ios::sync_with_stdio(0);
-    cin.tie(0);
+void build(vector<vector<int>> a, vector<vector<vector<int>>> &lookup, int n)
+{
+    for (int i = 0; i < n; i++)
+        lookup[i][0] = a[i];
 
-    #ifdef LOCAL
-    freopen("input.txt","r",stdin);
-    freopen("output.txt","w",stdout);
-    #endif
+    for (int j = 1; (1 << j) <= n; j++)
+    {
 
-    int n,m,k;
-    cin>>n>>m>>k;
-    auto f = [](int n){
-        int ans=0;
-        while(1<<(ans+1) <= n) ans++;
-        return ans;
-    };
-    // Read the matrix
-    vector<vector<int>> a(n, vector<int>(m));
-    for(int i=0;i<n;i++){
-        for(int j=0;j<m;j++){
-            cin>>a[i][j];
+        for (int i = 0; (i + (1 << j) - 1) < n; i++)
+        {
+
+            for (int k = 0; k < 5; k++)
+                lookup[i][j][k] = max(lookup[i][j - 1][k], lookup[i + (1 << (j - 1))][j - 1][k]);
         }
     }
-    // Build per-column sparse tables over rows
-    int LOG = f(n);
-    vector<vector<vector<int>>> st(m, vector<vector<int>>(n, vector<int>(LOG+1)));
-    for(int col=0; col<m; col++){
-        for(int i=0; i<n; i++){
-            st[col][i][0] = a[i][col];
-        }
-        for(int j=1; j<=LOG; j++){
-            for(int i=0; i+(1<<j)-1 < n; i++){
-                st[col][i][j] = max(st[col][i][j-1], st[col][i + (1<<(j-1))][j-1]);
-            }
+}
+
+vector<int> query(int L, int R, vector<vector<vector<int>>> &lookup)
+{
+    int j = (int)log2(R - L + 1);
+
+    vector<int> temp(5);
+
+    for (int i = 0; i < 5; i++)
+        temp[i] = max(lookup[L][j][i], lookup[R - (1 << j) + 1][j][i]);
+
+    return temp;
+}
+
+int32_t main()
+{
+#ifndef ONLINE_JUDGE
+    freopen("input.txt", "r", stdin);
+    freopen("output.txt", "w", stdout);
+#endif
+
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+
+    int n, m, k;
+    cin >> n >> m >> k;
+
+    vector<vector<long long>> a(n, vector<long long>(5, 0));
+    vector<vector<vector<long long>>> sparse(n, vector<vector<long long>>(20, vector<long long>(5, 0)));
+
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j < m; j++)
+        {
+            cin >> a[i][j];
         }
     }
-    // Define query function for range maximum
-    auto query = [&](int col, int l, int r) {
-        int len = r - l + 1;
-        int k = 0;
-        while((1 << (k+1)) <= len) k++;
-        return max(st[col][l][k], st[col][r - (1 << k) + 1][k]);
-    };
-    vector<int> ans(m,0);
-    int maxLen = 0;
-    int l=0,r=0;
-    // two-pointer using per-column range maxima
-    for(r=0;r<n;r++){
-        if(l>r) l=r;
-        vector<int> cur(m,0);
-        int sum = 0;
-        for(int i=0;i<m;i++){
-            cur[i] = query(i,l,r);
-            sum += cur[i];
-        }
-        while(l<=r && sum > k){
-            l++;
-            if(l<=r){
-                sum = 0;
-                for(int i=0;i<m;i++){
-                    cur[i] = query(i,l,r);
-                    sum += cur[i];
+
+    build(a, sparse, n);
+
+    vector<int> answer(5, 0);
+    int ans = 0;
+
+    for (int i = 0; i < n; i++)
+    {
+        int left = i, right = n - 1;
+
+        while (left <= right)
+        {
+            int mid = (left + right) / 2;
+
+            vector<int> mx = query(i, mid, sparse);
+            int sum = accumulate(mx.begin(), mx.end(), 0ll);
+
+            if (sum <= k)
+            {
+                if (ans < (mid - i + 1))
+                {
+                    ans = mid - i + 1;
+                    answer = mx;
                 }
+                left = mid + 1;
             }
-        }
-        if(l<=r && sum <= k){
-            int curLen = r-l+1;
-            if(maxLen < curLen){
-                ans = cur;
-                maxLen = curLen;
-            }
+            else
+                right = mid - 1;
         }
     }
-    for(auto it : ans) cout<<it<<" ";
-    return 0;
+
+    for (int i = 0; i < m; i++)
+        cout << answer[i] << " ";
 }
