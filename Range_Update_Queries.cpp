@@ -142,10 +142,10 @@ int32_t main(){
    ios::sync_with_stdio(0);
    cin.tie(0);
 
-   #ifdef LOCAL
+//    #ifdef LOCAL
    freopen("input.txt","r",stdin);
    freopen("output.txt","w",stdout);
-   #endif
+//    #endif
 
    int t=1;
 //    cin>>t;
