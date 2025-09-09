@@ -62,15 +62,19 @@ void solve() {
             cout<<a<<endl;
             continue;
         }
-        // cout<<a<<" "<<b<<" ";
-        for(int i=16;i>=0;i--){
-            if(parent[a][i] != parent[b][i]){
-                a=parent[a][i];
-                b=parent[b][i];
+        int ans=1;
+        int start=0,end=level[a];
+        while(start<=end){
+            int mid = (start+end)/2;
+            int aP=kthPar(a,mid),bP=kthPar(b,mid);
+            if(aP==bP){
+                ans=aP;
+                end=mid-1;
             }
+            else start=mid+1;
         }
         
-        cout<<parent[a][0]<<endl;
+        cout<<ans<<endl;
     }
 }
 
