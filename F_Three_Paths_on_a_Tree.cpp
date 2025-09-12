@@ -8,14 +8,12 @@ const int mod=1e9+7;
 #define pb push_back
 
 void solve() {
-   int n,q;
+   int n;
    cin>>n;
    vector<int> adj[n+1];
-   map<pii,int> map;
-   for(int i=1;i<n;i++){
+   for(int i=1;i<n;i++) {
     int u,v;
     cin>>u>>v;
-    map[{u,v}]=map[{v,u}]=i;
     adj[u].pb(v);
     adj[v].pb(u);
    }
@@ -51,38 +49,36 @@ void solve() {
        if(level[a]>level[b]) swap(a,b);
        int d = level[b]-level[a];
        b=findKthPar(b,d);
-       if(b==a) return a;
        for(int i=18;i>=0;i--){
            if(dp[a][i] != dp[b][i]){
                a=dp[a][i];
                b=dp[b][i];
            }
        }
-       return dp[a][0];
+       return (a == b) ? a : dp[a][0];
    };
-   cin>>q;
-   vector<int> pre(n+1,0);
-   //We'll Apply Prefix Sum technique on trees (+1 on both nodes and -1 on LCA && parent of LCA)
-   while(q--){
-    int u,v;
-    cin>>u>>v;
-    pre[v]+=1;
-    pre[u]+=1;
-    int L = lca(u,v);
-    // dbg(L);
-    pre[L]-=2;
-   }
-   vector<int> ans(n);
-   function<void(int,int)> dfs2=[&](int node,int par)->void{
-    for(auto child : adj[node]){
-        if(child == par) continue;
-        dfs2(child,node);
-        pre[node]+=pre[child];
-        ans[map[{child,node}]] = pre[child];
+   auto dist = [&](int a,int b)->int{
+    int l = lca(a,b);
+    return level[a]+level[b]-2*level[l];
+   };
+   //find Diameter Endpoints
+   int a=1;
+   for(int i=2;i<=n;i++) if(dist(1,i)>dist(1,a)) a=i;
+   int b=1;
+   for(int i=2;i<=n;i++) if(dist(a,i)>dist(a,b)) b=i;
+   int diam=dist(a,b);
+   //Now we go for each node and find contribution(max) 
+   int c=-1,val=0;
+   for(int i=1;i<=n;i++){
+    if(i==a||i==b) continue;
+    int d = (dist(i,a)+dist(i,b)-diam)/2;
+    if(d>=val) {
+        val=d;
+        c=i;
     }
-   };
-   dfs2(1,0);
-   for(int i=1;i<n;i++) cout<<ans[i]<<" ";
+   }
+   cout<<diam+val<<endl;
+   cout<<a<<" "<<b<<" "<<c;
 }
 
 int32_t main(){

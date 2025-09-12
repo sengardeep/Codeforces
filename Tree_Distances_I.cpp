@@ -10,14 +10,46 @@ const int mod=1e9+7;
 void solve() {
    int n;
    cin>>n;
-   vector<int> adj[n+1];
+   vector<vector<int>> adj(n+1);
    for(int i=1;i<n;i++) {
       int u,v;
       cin>>u>>v;
       adj[u].pb(v);
       adj[v].pb(u);
    }  
-   vector<int> indp(n+1,0),outdp(n+1,0);
+   vector<int> indp(n+1,0); //Max subtree height 
+   vector<int> outdp(n+1,0); //Max distance we can get by making Root i
+   function<void(int,int)> indfs=[&](int node,int par)->void{
+      for(auto child : adj[node]){
+         if(child==par) continue;
+         indfs(child,node);
+         indp[node]=max(indp[child]+1,indp[node]);
+      }
+   };
+   indfs(1,0);
+   function<void(int,int)> outdfs=[&](int node,int par)->void{
+      int mx1=-1,mx2=-1,maxChild=0;
+      for(auto child : adj[node]){
+         if(child==par) continue;
+         int val = 1 + indp[child];
+         if(val >= mx1){
+            mx2 = mx1;
+            mx1 = val;
+            maxChild = child;
+         }else if(val > mx2){
+            mx2 = val;
+         }
+      }
+      for(auto child : adj[node]){
+         if(child==par) continue;
+         int largest = mx1;
+         if(maxChild==child) largest=mx2;
+         outdp[child]=1+max(outdp[node],largest);
+         outdfs(child,node);
+      }
+   };
+   outdfs(1,0);
+   for(int i=1;i<=n;i++) cout<<max(indp[i],outdp[i])<<" ";
 }
 
 int32_t main(){
