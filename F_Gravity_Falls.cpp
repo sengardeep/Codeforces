@@ -11,33 +11,41 @@ void solve() {
     int n;
     cin >> n;
     vector<vector<int>> v(n);
-    vector<int> sizes;
-    int maxSize=0;
     for (int i = 0; i < n; i++) {
         int k; cin >> k;
-        sizes.pb(k);
-        maxSize=max(maxSize,k);
         v[i].resize(k);
         for (int j = 0; j < k; j++) cin >> v[i][j];
     }
-    const int maxi = LLONG_MAX;
-    for(int i=0;i<n;i++){
-        int rem = maxSize-sizes[i];
-        while(rem--){
-            v[i].pb(maxi);
-        }
-    }
-    sort(begin(v), end(v));
-    vector<int> ans;
-    int idx=0;
-    for(int i=0;i<n;i++){
-        for(size_t j=idx; j<v[i].size() && v[i][j] != maxi; j++){
-            ans.pb(v[i][j]);
-            idx++;
+    sort(begin(v),end(v),[](vector<int>&a,vector<int>&b){
+        return a.size()<b.size();
+    });
+    int maxSize=v.back().size();
+    vector<int> ans(maxSize,LLONG_MAX);
+    vector<int> edit;
+    edit.pb(0);
+    for(auto &vi : v){
+        int k=vi.size();
+        int s=edit.size();
+        for(int i=0;i<s;i++){
+            int l=edit[i],r=(i+1<s?edit[i+1]:k);
+            bool flag=false;
+            for(int j=l;j<r;j++){
+                if(ans[j]<vi[j]) break;
+                if(ans[j]>vi[j]) {
+                    flag=true;
+                    break;
+                }
+            }
+            if(flag){
+                for(int j=l;j<k;j++) ans[j]=vi[j];
+                while(edit.back() > l) edit.pop_back();
+                edit.pb(k);
+                break;
+            }
         }
     }
     for(auto it : ans) cout<<it<<" ";
-    cout << endl;
+    cout<<endl;
 }
 
 int32_t main(){
