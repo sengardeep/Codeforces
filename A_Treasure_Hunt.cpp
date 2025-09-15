@@ -1,102 +1,99 @@
 #include <bits/stdc++.h>
-#define int long long
-#define MOD 1000000007
-#define fastio() (ios_base::sync_with_stdio(false), cin.tie(NULL))
 using namespace std;
-
-// Common Macros
-#define vi vector<int>
-#define vvi vector<vi>
-#define all(v) v.begin(), v.end()
-#define pb push_back
-#define FOR(i, start, end) for (int i = start; i < end; ++i)
+#define int long long
+const int mod = 1e9 + 7;
+#define endl "\n"
 #define dbg(x) cerr << #x << " = " << (x) << endl
-#define YES cout << "YES" << endl;
-#define NO cout << "NO" << endl;
-#define INF LLONG_MAX
-#define MOD_INV(x) mod_exp(x, MOD - 2, MOD)
-#define MAX 100000
+#define pii pair<int, int>
+#define pb push_back
+const int INF = 1e18;
 
-// Debugging Helpers
-template <typename T> void dbg_vec(const T &v) {
-    cerr << "[ ";
-    for (const auto &x : v) cerr << x << " ";
-    cerr << "]" << endl;
-}
-
-// Modular Arithmetic
-class ModInt {
-public:
-    int val;
-    ModInt(int v = 0) : val(v % MOD) { if (val < 0) val += MOD; }
-    ModInt operator+(const ModInt &other) const { return ModInt(val + other.val); }
-    ModInt operator-(const ModInt &other) const { return ModInt(val - other.val); }
-    ModInt operator*(const ModInt &other) const { return ModInt(val * other.val); }
-    ModInt pow(int exp) const {
-        ModInt base = *this, res = 1;
-        while (exp) {
-            if (exp % 2) res = res * base;
-            base = base * base;
-            exp /= 2;
+void solve()
+{
+    int h, w, k;
+    cin >> h >> w >> k;
+    int n = h * w;
+    vector<int> moves(n, INF);
+    priority_queue<pii, vector<pii>, greater<pii>> pq;
+    auto flat = [&](int r, int c)
+    {
+        return r * w + c;
+    };
+    for (int i = 0; i < k; ++i)
+    {
+        int x, y;
+        cin >> x >> y;
+        x--;
+        y--;
+        int v = flat(x, y);
+        if (moves[v] > 0)
+        {
+            moves[v] = 0;
+            pq.push({0, v});
         }
-        return res;
     }
-    ModInt inv() const { return pow(MOD - 2); }
-    ModInt operator/(const ModInt &other) const { return *this * other.inv(); }
-};
+    vector<pair<int, int>> dir = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+    vector<int> min1(n, INF), min2(n, INF);
+    while (!pq.empty())
+    {
+        auto [dist, node] = pq.top();
+        pq.pop();
+        if (dist != moves[node])
+            continue;
+        int r = node / w, c = node % w;
+        for (int i = 0; i < 4; ++i)
+        {
+            int row = r + dir[i].first, col = c + dir[i].second;
+            if (row < 0 || row >= h || col < 0 || col >= w)
+                continue;
+            int v = flat(row, col);
+            int val = moves[node];
+            if (val < min1[v])
+            {
+                min2[v] = min1[v];
+                min1[v] = val;
+            }
+            else if (val < min2[v])
+            {
+                min2[v] = val;
+            }
+            else
+                continue;
 
-// Utility Functions
-int gcd(int a, int b) { return b ? gcd(b, a % b) : a; }
-int lcm(int a, int b) { return (a / gcd(a, b)) * b; }
-bool is_prime(int n) {
-    if (n <= 1) return false;
-    for (int i = 2; i * i <= n; ++i) if (n % i == 0) return false;
-    return true;
-}
-int mod_exp(int base, int exp, int mod = MOD) {
-    int result = 1;
-    while (exp) {
-        if (exp % 2 == 1) result = (result * base) % mod;
-        base = (base * base) % mod;
-        exp /= 2;
+            if (min2[v] < INF)
+            {
+                int temp = 1 + min2[v];
+                if (temp < moves[v])
+                {
+                    moves[v] = temp;
+                    pq.push({moves[v], v});
+                }
+            }
+        }
     }
-    return result;
-}
-// Fast Input/Output Functions
-template<typename T> void read(T& x) { cin >> x; }
-template<typename T, typename... Args>
-void read(T& first, Args&... rest) {
-    cin >> first;
-    read(rest...);
-}
-template<typename T> void read(vector<T>& v) { for (auto &x : v) cin >> x; }
-template<typename T> void print(const vector<T>& v) { for (auto &x : v) cout << x << " "; cout << endl; }
-
-
-// Created by Deep 
-// Date : 08-04-2025 
-// Time : 07:09
-
-
-// Solution Function
-void solve() {
-    int n,m,a;
-    read(n,m,a);
-    int total=n+m;
-    int rem = a % total;
-    if(rem-n < 0)  NO
-    else YES
+    int ans = 0;
+    for (int i = 0; i < n; i++)
+        if (moves[i] < INF)
+            ans += moves[i];
+    cout << ans << endl;
 }
 
-// Main Function
-int32_t main() {
-    fastio();
-    #ifdef LOCAL
-        freopen("input.txt", "r", stdin);
-        freopen("output.txt", "w", stdout);
-    #endif
+int32_t main()
+{
+    ios::sync_with_stdio(0);
+    cin.tie(0);
+
+#ifdef LOCAL
+    freopen("input.txt", "r", stdin);
+    freopen("output.txt", "w", stdout);
+#endif
+
     int t = 1;
-    cin >> t;
-    while (t--) solve();
+    //    cin>>t;
+    while (t--)
+    {
+        solve();
+    }
+
     return 0;
 }
