@@ -10,15 +10,28 @@ const int mod=1e9+7;
 void solve() {
    int l,r;
    cin>>l>>r;
-   vector<int> a(r),b(r);
-   iota(begin(a),end(a),0);
-   iota(begin(b),end(b),0);
-   if(r&1){
-
+   vector<int> ans(r+1),pos(r+1);
+   iota(begin(ans),end(ans),0);
+   iota(begin(pos),end(pos),0);
+   //Pair each element with its compliment
+   auto f = [&](int n){
+      if(n == 0) return 0LL;
+      int lg = 63 - __builtin_clzll((unsigned long long)n);
+      return 1LL << lg;
+   };
+   vector<bool> done(r+1,false);
+   for(int x = f(r); x > 0; x >>= 1){
+      if(done[pos[x]]) continue;
+      for(int i=pos[x],j=pos[x]-1;i<=r&&j>=0;i++,j--){
+         if(done[i]) break;
+         swap(pos[ans[i]],pos[ans[j]]);
+         swap(ans[i],ans[j]);
+         done[i]=done[j]=true;
+      }
    }
-   else{
-      
-   }
+   cout<<r*(r+1)<<endl;
+   for(auto it : ans) cout<<it<<" ";
+   cout<<endl;
 }
 
 int32_t main(){
