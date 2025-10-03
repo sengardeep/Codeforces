@@ -8,19 +8,17 @@ const int mod=1e9+7;
 #define pb push_back
 
 void solve() {
-   int n;
-   cin>>n;
+   int n,q;
+   cin>>n>>q;
    vector<int> v(n);
    for(int i=0;i<n;i++) cin>>v[i];
-   sort(begin(v),end(v));
-   int ans=n;
-   for(int i=0;i<n-1;i++){
-      int x=v[i]+v[i+1]-1;
-      int idx=upper_bound(begin(v),end(v),x)-begin(v);
-      idx-=1;
-      ans = min(ans,n-(idx-i+1));
+   while(q--){
+    int l,r;
+    cin>>l>>r;
+    --l;
+    --r;
+    
    }
-   cout<<ans<<endl;
 }
 
 int32_t main(){
