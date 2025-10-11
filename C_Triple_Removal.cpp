@@ -18,7 +18,9 @@ void solve() {
     if(l>0) return pre[r]-pre[l-1];
     else return pre[r];
    };
-   SegTree seg(v);
+   vector<int> temp;
+   for(int i=0;i<n-1;i++) if(v[i]==v[i+1]) temp.pb(i);
+   sort(temp.begin(),temp.end());
    while(q--){
     int l,r;
     cin>>l>>r;
