@@ -30,7 +30,14 @@ void solve() {
     if(len%3 || sum%3) cout<<-1<<endl;
     else{
         int ans=len/3;
-        if(seg.query(l,r)) cout<<ans<<endl;
+        int ub=upper_bound(begin(temp),end(temp),(l-1))-temp.begin();
+        if(ub<temp.size())
+        ub=temp[ub];
+        else {
+            cout<<ans+1<<endl;
+            continue;
+        }
+        if(ub<r) cout<<ans<<endl;
         else cout<<ans+1<<endl;
     }
    }
