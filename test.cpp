@@ -1,93 +1,62 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-#define int long long
-const int mod = 1e9 + 7;
-#define endl "\n"
-#define dbg(x) cerr << #x << " = " << x << endl;
-
-void solve() {
-    int n, m, s;
-    cin >> n >> m >> s;
-    vector<string> v(n);
-    for (int i = 0; i < n; i++) cin >> v[i];
-    vector<vector<int>> dist(n, vector<int>(m, -1));
-    queue<pair<int, int>> q;
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < m; j++) {
-            if (v[i][j] == '#') {
-                q.push({i, j});
-                dist[i][j] = 0;
-            }
+static inline bool can_reach_all(const vector<long long>& A, long long h){
+    int n = (int)A.size();
+    if(n==0) return true;
+    vector<char> vis(n+1, 0); // 0 = ground, 1..n platforms
+    deque<int> q;
+    // Start from ground: enqueue all platforms reachable from ground
+    for(int i=1;i<=n;i++){
+        if(A[i-1] <= h){
+            vis[i] = 1;
+            q.push_back(i);
         }
     }
-    vector<pair<int, int>> dir{{-1, 0}, {0, -1}, {1, 0}, {0, 1}};
+    int reached = (int)q.size();
     while(!q.empty()){
-        pair<int, int> curr = q.front();
-        q.pop();
-
-        for(auto& d : dir){
-            int nr = curr.first + d.first;
-            int nc = curr.second + d.second;
-
-            if (nr >= 0 && nr < n && nc >= 0 && nc < m && dist[nr][nc] == -1) {
-                dist[nr][nc] = dist[curr.first][curr.second] + 1;
-                q.push({nr, nc});
+        int i = q.front(); q.pop_front();
+        // i-1 neighbor
+        if(i-1>=1 && !vis[i-1]){
+            if(llabs(A[i-1] - A[i-2]) <= h){
+                vis[i-1] = 1;
+                q.push_back(i-1);
+                reached++;
+            }
+        }
+        // i+1 neighbor
+        if(i+1<=n && !vis[i+1]){
+            if(llabs(A[i] - A[i-1]) <= h){
+                vis[i+1] = 1;
+                q.push_back(i+1);
+                reached++;
             }
         }
     }
-
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < m; j++) {
-            bool flag1 = (i >= s && i < n - s && j >= s && j < m - s);
-            bool flag2 = (dist[i][j] == -1 || dist[i][j] > s);
-            
-            if (flag1 && flag2) {
-                v[i][j] = '*';
-            }
-        }
-    }
-    int ans = 0, count = 0;
-    auto check2 = [&](int r, int c) {
-        if (r < 0 || r > n - 1 || c < 0 || c > m - 1) return false;
-        return true;
-    };
-    function<void(int, int)> dfs = [&](int r, int c) -> void {
-        count++;
-        v[r][c] = '.';
-        for (int i = 0; i < 4; i++) {
-            int ro = r + dir[i].first, co = c + dir[i].second;
-            if (check2(ro, co) == false) continue;
-            if (v[ro][co] == '*') dfs(ro, co);
-        }
-    };
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < m; j++) {
-            if (v[i][j] == '*') {
-                count = 0;
-                dfs(i, j);
-                ans = max(ans, count);
-            }
-        }
-    }
-    cout << ans << endl;
+    return reached == n;
 }
 
-int32_t main() {
-    ios::sync_with_stdio(0);
-    cin.tie(0);
-
-#ifdef LOCAL
-    freopen("input.txt", "r", stdin);
-    freopen("output.txt", "w", stdout);
-#endif
-
-    int t = 1;
-    cin >> t;
-    for (int i = 1; i <= t; i++) {
-        cout << "Case #" << i << ": ";
-        solve();
+long long solve_binary(const vector<long long>& A){
+    if(A.empty()) return 0;
+    long long maxA = 0, maxDiff = 0;
+    for(long long x: A) maxA = max(maxA, x);
+    for(size_t i=1;i<A.size();i++) maxDiff = max(maxDiff, llabs(A[i]-A[i-1]));
+    long long lo = 0, hi = max(maxA, maxDiff);
+    while(lo < hi){
+        long long mid = (lo + hi) >> 1;
+        if(can_reach_all(A, mid)) hi = mid;
+        else lo = mid + 1;
     }
+    return lo;
+}
 
+int main(){
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+    int N;
+    if(!(cin>>N)) return 0;
+    vector<long long> A(N);
+    for(int i=0;i<N;i++) cin>>A[i];
+    cout << solve_binary(A) << "\n";
     return 0;
 }
