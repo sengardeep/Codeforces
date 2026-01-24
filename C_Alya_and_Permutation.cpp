@@ -20,9 +20,11 @@ void solve() {
     set.insert(n);
     set.insert(n-1);
     int l=__lg(n);
-    int x=(1<<(l-1));
+    int x=((1<<l)-1);
     set.insert(x);
-    v[n-2]=x;
+    v[n-3]=x;
+    v[n-4]=1;
+    set.insert(1);
     int j=0;
     for(int i=1;i<=n;i++){
         if(set.count(i)) continue;
@@ -32,19 +34,25 @@ void solve() {
     cout<<endl;
    }else{
     int l=__lg(n);
-    cout<<((1<<l)-1)<<endl;
+    cout<<((1<<(l+1))-1)<<endl;
     v[n-1]=n;
-    int x=(1<<(l-1));
+    int x=((1<<l)-1);
     v[n-2]=x;
-    v[n-3]=x-1;
-    v[n-4]=3;
-    v[n-5]=1;
     set<int> set;
-    set.insert(1);
-    set.insert(3);
-    set.insert(x);
-    set.insert(x-1);
     set.insert(n);
+    set.insert(x);
+    if(x==3){
+        v[n-3]=1;
+        set.insert(1);
+    }else 
+    {
+        v[n-3]=x-1;
+        set.insert(x-1);
+        v[n-4]=3;
+        v[n-5]=1;
+        set.insert(3);
+        set.insert(1);
+    }
     int j=0;
     for(int i=1;i<=n;i++){
         if(set.count(i)) continue;
