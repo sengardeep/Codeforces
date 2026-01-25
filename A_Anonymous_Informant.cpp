@@ -11,29 +11,31 @@ const int mod=1e9+7;
 void solve() {
    int n,k;
    cin>>n>>k;
-   if(n<=62 && (1LL<<(n-1))<k) {
-    cout<<-1<<endl;
-    return;
-   }
-   vector<int> ans(n);
-   int l=0,r=n-1;
-   for(int i=1;i<n;i++){
-    int rem=(n-1)-i;
-    int count=0;
-    if(rem>=60) count=k+1;
-    else count=(1LL<<rem);
-    if(count>=k){
-        ans[l]=i;
-        l++;
+   vector<int> v(n);
+   for(int i=0;i<n;i++) cin>>v[i];
+   set<int> set;
+   int idx=n-1,x=v[idx];
+   while(k--){
+    if(x>n){
+        cout<<"No"<<endl;
+        return;
+    }
+    if(set.count(idx)){
+        cout<<"Yes"<<endl;
+        return;
+    }
+    set.insert(idx);
+    if(idx>=x){
+        idx-=x;
+        x=v[idx];
     }else{
-        ans[r]=i;
-        r--;
-        k-=count;
+        int rem=x-idx-1;
+        idx=n-1;
+        idx-=rem;
+        x=v[idx];
     }
    }
-   ans[l]=n;
-   for(auto x : ans) cout<<x<<" ";
-   cout<<endl;
+   cout<<"Yes"<<endl;
 }
 
 int32_t main(){
