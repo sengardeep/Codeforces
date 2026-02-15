@@ -1,186 +1,83 @@
 #include <iostream>
 #include <vector>
-#include <string>
-#include <queue>
-#include <map>
+#include <random>
+#include <fstream>
+#include <algorithm>
+#include <ctime>
 
 using namespace std;
 
-// Standard Face IDs for our "Virtual Cube"
-// 0: Top, 1: Front, 2: Right, 3: Back, 4: Left, 5: Bottom
-const int TOP = 0, FRONT = 1, RIGHT = 2, BACK = 3, LEFT = 4, BOTTOM = 5;
+// --- CONFIGURATION ---
+const int T_CASES = 1000;      // Number of test cases
+const int MAX_N = 2000;       // Max N
+const int MAX_VAL = 1000000000; // Max intensity value (10^9)
 
-// Opposites map (Top<->Bottom, Front<->Back, Left<->Right)
-int opposite[] = {5, 3, 4, 1, 2, 0};
+mt19937 rng(time(0));
 
-// Helper to find the face to the "Right" relative to (current, up)
-int getRightFace(int cur, int up) {
-    // Hardcoded cyclic relationships
-    // If Up is 0 (Top), sequence is Front->Right->Back->Left
-    if (up == 0) {
-        if (cur == 1) return 2; if (cur == 2) return 3; if (cur == 3) return 4; if (cur == 4) return 1;
-    }
-    // If Up is 1 (Front)
-    if (up == 1) {
-        if (cur == 5) return 2; if (cur == 2) return 0; if (cur == 0) return 4; if (cur == 4) return 5;
-    }
-    // If Up is 2 (Right)
-    if (up == 2) {
-        if (cur == 0) return 3; if (cur == 3) return 5; if (cur == 5) return 1; if (cur == 1) return 0;
-    }
-    // If Up is 3 (Back)
-    if (up == 3) {
-        if (cur == 0) return 2; if (cur == 2) return 5; if (cur == 5) return 4; if (cur == 4) return 0;
-    }
-    // If Up is 4 (Left)
-    if (up == 4) {
-        if (cur == 0) return 1; if (cur == 1) return 5; if (cur == 5) return 3; if (cur == 3) return 0;
-    }
-    // If Up is 5 (Bottom)
-    if (up == 5) {
-        if (cur == 1) return 4; if (cur == 4) return 3; if (cur == 3) return 2; if (cur == 2) return 1;
-    }
-    return -1; 
+// Random helper
+int random(int min, int max) {
+    return uniform_int_distribution<int>(min, max)(rng);
 }
 
-struct State {
-    int r, c;       // Grid Position
-    int curFace;    // Current Canonical Face ID (0-5)
-    int upFace;     // Which Canonical Face is logically "Up" from here
-};
-
 int main() {
-    // 1. Read Input
-    vector<string> grid(4);
-    for (int i = 0; i < 4; i++) cin >> grid[i];
+    ofstream inFile("input.txt");
+    ofstream outFile("output.txt");
 
-    string contentStr;
-    cin >> contentStr;
+    if (!inFile || !outFile) return 1;
 
-    string query;
-    cin >> query;
+    inFile << T_CASES << "\n";
 
-    // 2. Store Content: Map 'A' -> "abcd"
-    map<char, string> faceData;
-    // To know which Letter (A-Z) is at which Canonical ID (0-5)
-    char canonicalToInputChar[6]; 
-    
-    // Find ordered faces to map the content string
-    vector<char> foundFaces;
-    int startR = -1, startC = -1;
+    for (int t = 0; t < T_CASES; ++t) {
+        int N = random(2, MAX_N); // N must be at least 2
+        inFile << N << "\n";
 
-    for(int i=0; i<4; i++) {
-        for(int j=0; j<4; j++) {
-            if(grid[i][j] != '.') {
-                if(startR == -1) { startR = i; startC = j; } // Pick first as start
-                foundFaces.push_back(grid[i][j]);
+        vector<int> A(N);
+        
+        // Mode 1: Completely Random (Noise)
+        if (t % 3 == 0) {
+            for (int i = 0; i < N; ++i) A[i] = random(1, 100); 
+        }
+        // Mode 2: Many Sparks (e.g., 1 1 2 2 3 3...)
+        else if (t % 3 == 1) {
+            for (int i = 0; i < N; ++i) A[i] = (i / 2) + 1;
+        }
+        // Mode 3: Sparse Sparks (Two distant sparks)
+        else {
+            for (int i = 0; i < N; ++i) A[i] = i + 1; // All distinct initially
+            // Force sparks at start and end
+            if (N > 5) {
+                A[1] = A[0];         // Spark at index 0
+                A[N-1] = A[N-2];     // Spark at index N-2
             }
         }
-    }
-    
-    // Assign content strings
-    int idx = 0;
-    for(char f : foundFaces) {
-        faceData[f] = contentStr.substr(idx * 4, 4);
-        idx++;
-    }
 
-    // 3. BFS to Map Grid to Virtual Cube
-    // We start assuming the first found face is TOP (0), and its "Up" is BACK (3).
-    // (Any valid starting orientation works)
-    queue<State> q;
-    q.push({startR, startC, TOP, BACK});
-    
-    // Keep track of visited grid cells
-    bool visited[4][4] = {false};
-    visited[startR][startC] = true;
-    canonicalToInputChar[TOP] = grid[startR][startC];
+        // Write Input
+        for (int i = 0; i < N; ++i) {
+            inFile << A[i] << (i == N - 1 ? "" : " ");
+        }
+        inFile << "\n";
 
-    int dr[] = {0, 0, 1, -1}; // Right, Left, Down, Up
-    int dc[] = {1, -1, 0, 0};
-
-    while(!q.empty()) {
-        State s = q.front();
-        q.pop();
-
-        char currentChar = grid[s.r][s.c];
-        canonicalToInputChar[s.curFace] = currentChar;
-
-        // Explore neighbors
-        for(int i=0; i<4; i++) {
-            int nr = s.r + dr[i];
-            int nc = s.c + dc[i];
-
-            if(nr >= 0 && nr < 4 && nc >= 0 && nc < 4 && grid[nr][nc] != '.' && !visited[nr][nc]) {
-                visited[nr][nc] = true;
-                
-                int nextFace, nextUp;
-
-                if(i == 0) { // Moved RIGHT in grid
-                    nextFace = getRightFace(s.curFace, s.upFace);
-                    nextUp = s.upFace; // Up direction doesn't change when moving sideways
-                } else if (i == 1) { // Moved LEFT in grid
-                    // Left is opposite of Right
-                    nextFace = opposite[getRightFace(s.curFace, s.upFace)];
-                    nextUp = s.upFace;
-                } else if (i == 2) { // Moved DOWN in grid
-                    // Moving down the grid means moving to the face "opposite of Up"
-                    nextFace = opposite[s.upFace];
-                    nextUp = s.curFace; // The old current face becomes the new Up
-                } else { // Moved UP in grid
-                    nextFace = s.upFace;
-                    nextUp = opposite[s.curFace];
-                }
-
-                q.push({nr, nc, nextFace, nextUp});
+        // --- SOLVER LOGIC FOR OUTPUT ---
+        // Logic: If sparks > 1, we must merge them into one chain.
+        // Cost = (Index of Last Spark) - (Index of First Spark).
+        
+        vector<int> sparks;
+        for (int i = 0; i < N - 1; ++i) {
+            if (A[i] == A[i+1]) {
+                sparks.push_back(i); // Store 0-based index of spark
             }
         }
+
+        long long ans = 0;
+        if (sparks.size() > 1) {
+            ans = sparks.back() - sparks.front();
+        }
+        
+        outFile << ans << "\n";
     }
 
-    // 4. Solve Query
-    // We have 3 query faces. We match them against the 8 standard corners.
-    // 2x2 Indices: Top-Left(0), Top-Right(1), Bottom-Left(2), Bottom-Right(3)
-    
-    // Define the 8 corners of a standard cube (FaceID, Index on that face)
-    struct CornerPiece { int face; int idx; };
-    vector<vector<CornerPiece>> allCorners = {
-        {{TOP, 3}, {FRONT, 1}, {RIGHT, 0}}, // Top-Front-Right
-        {{TOP, 2}, {LEFT, 1}, {FRONT, 0}},  // Top-Left-Front
-        {{TOP, 0}, {BACK, 1}, {LEFT, 0}},   // Top-Back-Left
-        {{TOP, 1}, {RIGHT, 1}, {BACK, 0}},  // Top-Right-Back
-        {{BOTTOM, 1}, {RIGHT, 2}, {FRONT, 3}}, // Bottom-Right-Front
-        {{BOTTOM, 0}, {FRONT, 2}, {LEFT, 3}},  // Bottom-Front-Left
-        {{BOTTOM, 2}, {LEFT, 2}, {BACK, 3}},   // Bottom-Left-Back
-        {{BOTTOM, 3}, {BACK, 2}, {RIGHT, 3}}   // Bottom-Back-Right
-    };
-
-    // Check which standard corner matches the user's query (ignoring order for matching)
-    for(auto &corner : allCorners) {
-        // Get the actual input chars for this corner definition
-        char c1 = canonicalToInputChar[corner[0].face];
-        char c2 = canonicalToInputChar[corner[1].face];
-        char c3 = canonicalToInputChar[corner[2].face];
-
-        // Check if these 3 chars match the query (A, B, C)
-        bool match = true;
-        for(char qC : query) {
-            if(qC != c1 && qC != c2 && qC != c3) match = false;
-        }
-
-        if(match) {
-            // Found the corner! Print matching chars IN ORDER of the query
-            for(char qC : query) {
-                // Find which part of the corner this qC corresponds to
-                for(int k=0; k<3; k++) {
-                    if(canonicalToInputChar[corner[k].face] == qC) {
-                         cout << faceData[qC][corner[k].idx];
-                    }
-                }
-            }
-            cout << endl;
-            return 0;
-        }
-    }
-
+    inFile.close();
+    outFile.close();
+    cout << "Generated input.txt and output.txt" << endl;
     return 0;
 }
