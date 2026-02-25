@@ -3,41 +3,42 @@
 
 using namespace std;
 
-void solve() {
-    int N; // Number of coins
-    if (!(cin >> N)) return;
-    
-    int Q; // Number of wishes
-    cin >> Q;
-
-    vector<int> coins(N + 1);
-    vector<int> prefixXor(N + 1, 0);
-
-    // Read coins and build Prefix XOR array
-    for (int i = 1; i <= N; ++i) {
-        cin >> coins[i];
-        prefixXor[i] = prefixXor[i - 1] ^ coins[i];
-    }
-
-    while (Q--) {
-        int L, R;
-        cin >> L >> R;
-        
-        // Apply the formula: P[R] ^ P[L-1]
-        // This takes O(1) time per wish!
-        int answer = prefixXor[R] ^ prefixXor[L - 1];
-        
-        cout << answer << "\n";
-    }
-}
-
 int main() {
-    // Fast I/O
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
-	freopen("input.txt","r",stdin);
-   freopen("output.txt","w",stdout);
-    solve();
-    
+    // Read from input.txt and write to output.txt
+    freopen("input.txt", "r", stdin);
+    freopen("output.txt", "w", stdout);
+
+    int n, m;
+    if (!(cin >> n >> m)) return 0;
+
+    vector<int> s(n + 1), t(n + 1);
+    for (int i = 1; i <= n; i++) cin >> s[i];
+    for (int i = 1; i <= n; i++) cin >> t[i];
+
+    // Array to count swaps
+    vector<int> diff(n + 2, 0);
+    for (int i = 0; i < m; i++) {
+        int l, r;
+        cin >> l >> r;
+        // Mark the start and end of the range
+        diff[l]++;
+        diff[r + 1]--;
+    }
+
+    int swaps = 0;
+    for (int i = 1; i <= n; i++) {
+        // Add up marks to get total swaps for this slot
+        swaps += diff[i];
+        
+        // Odd swaps mean we take from Box T
+        if (swaps % 2 != 0) {
+            cout << t[i] << (i == n ? "" : " ");
+        } else {
+            // Even swaps mean we take from Box S
+            cout << s[i] << (i == n ? "" : " ");
+        }
+    }
+    cout << "\n";
+
     return 0;
 }
