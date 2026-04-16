@@ -100,10 +100,10 @@ void solve() {
 // Main Function
 int32_t main() {
     fastio();
-    #ifdef LOCAL
+    // #ifdef LOCAL
         freopen("input.txt", "r", stdin);
         freopen("output.txt", "w", stdout);
-    #endif
+    // #endif
     int t = 1;
     cin >> t;
     while (t--) solve();

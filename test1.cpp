@@ -1,44 +1,57 @@
-#include <iostream>
-#include <vector>
-
+#include <bits/stdc++.h>
 using namespace std;
+#define ll long long
 
-int main() {
-    // Read from input.txt and write to output.txt
-    freopen("input.txt", "r", stdin);
-    freopen("output.txt", "w", stdout);
+mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
-    int n, m;
-    if (!(cin >> n >> m)) return 0;
+ll randll(ll l, ll r){
+    return uniform_int_distribution<ll>(l, r)(rng);
+}
 
-    vector<int> s(n + 1), t(n + 1);
-    for (int i = 1; i <= n; i++) cin >> s[i];
-    for (int i = 1; i <= n; i++) cin >> t[i];
+ll solve(ll N, ll S, ll M, ll L){
+    ll ans = 1e18;
 
-    // Array to count swaps
-    vector<int> diff(n + 2, 0);
-    for (int i = 0; i < m; i++) {
-        int l, r;
-        cin >> l >> r;
-        // Mark the start and end of the range
-        diff[l]++;
-        diff[r + 1]--;
-    }
+    for(int i = 0; i <= 100; i++){
+        for(int j = 0; j <= 100; j++){
+            ll eggs = 6LL*i + 8LL*j;
+            ll rem = max(0LL, N - eggs);
+            ll k = (rem + 11) / 12;
 
-    int swaps = 0;
-    for (int i = 1; i <= n; i++) {
-        // Add up marks to get total swaps for this slot
-        swaps += diff[i];
-        
-        // Odd swaps mean we take from Box T
-        if (swaps % 2 != 0) {
-            cout << t[i] << (i == n ? "" : " ");
-        } else {
-            // Even swaps mean we take from Box S
-            cout << s[i] << (i == n ? "" : " ");
+            ll cost = (i*S + j*M + k*L)%(1000000007);
+            ans = min(ans, cost);
         }
     }
-    cout << "\n";
+
+    return ans;
+}
+
+int main(){
+    // ----------------------------
+    // Generate Test Case
+    // ----------------------------
+    freopen("input.txt","w",stdout);
+
+    ll N = randll(1, 100);
+    ll S = randll(1, 1000);
+    ll M = randll(1, 1000);
+    ll L = randll(1, 1000);
+
+    cout << N << " " << S << " " << M << " " << L << "\n";
+
+    fclose(stdout);
+
+    // ----------------------------
+    // Solve and Output
+    // ----------------------------
+    freopen("input.txt","r",stdin);
+    freopen("output.txt","w",stdout);
+
+    cin >> N >> S >> M >> L;
+
+    cout << solve(N, S, M, L) << "\n";
+
+    fclose(stdin);
+    fclose(stdout);
 
     return 0;
 }
